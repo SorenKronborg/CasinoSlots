@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrades/upgrade_card.gd" id="1_script"]
+
+[node name="UpgradeCard" type="PanelContainer"]
+theme_type_variation = &"UpgradeCard"
+script = ExtResource("1_script")
+
+[node name="Row" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Text" type="VBoxContainer" parent="Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Row/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CardTitle"
+text = "Title"
+
+[node name="Description" type="Label" parent="Row/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CardBody"
+text = "Description"
+autowrap_mode = 3
+
+[node name="BuyButton" type="Button" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"CardButton"
+text = "Buy"

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="UpgradeTree" format=3 uid="uid://ct24ns5q6t8qt"]
+
+[ext_resource type="Script" uid="uid://by2am8ityx7jb" path="res://scripts/data/upgrade_tree.gd" id="1_tree"]
+[ext_resource type="Script" uid="uid://pis0t4fdmbcf" path="res://scripts/data/upgrade_data.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_double_stake"]
+script = ExtResource("2_upgrade")
+id = &"double_stake"
+title = "High Roller"
+description = "Every spin costs 2 credits instead of 1, and every win pays double."
+cost = 10
+bet_multiplier = 2
+
+[sub_resource type="Resource" id="Upgrade_auto_spin"]
+script = ExtResource("2_upgrade")
+id = &"auto_spin"
+title = "Autopilot"
+description = "Adds an AUTOMATIC button that keeps the reels turning without clicking."
+cost = 25
+requires = &"double_stake"
+unlocks = Array[StringName]([&"auto_spin"])
+
+[sub_resource type="Resource" id="Upgrade_fourth_reel"]
+script = ExtResource("2_upgrade")
+id = &"fourth_reel"
+title = "Fourth Wheel"
+description = "Bolts another wheel onto the cabinet. Four of a kind pays double."
+cost = 200
+requires = &"auto_spin"
+extra_reels = 1
+
+[resource]
+script = ExtResource("1_tree")
+upgrades = Array[ExtResource("2_upgrade")]([SubResource("Upgrade_double_stake"), SubResource("Upgrade_auto_spin"), SubResource("Upgrade_fourth_reel")])
