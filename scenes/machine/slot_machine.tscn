@@ -1,112 +1,55 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/machine/slot_machine.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://scenes/machine/reel.tscn" id="2_reel"]
-[ext_resource type="Resource" path="res://resources/symbols/default_set.tres" id="3_symbols"]
-[ext_resource type="Resource" path="res://resources/paytables/default.tres" id="4_paytable"]
-[ext_resource type="Resource" path="res://resources/upgrades/default_tree.tres" id="5_upgrades"]
-[ext_resource type="PackedScene" path="res://scenes/machine/payout_slot.tscn" id="6_payout"]
+[ext_resource type="Script" path="res://scripts/machine/slot_machine.gd" id="1_machine"]
 
-[node name="SlotMachine" type="Control"]
-layout_mode = 3
+[sub_resource type="StyleBoxFlat" id="Cabinet"]
+bg_color = Color(0.18, 0.07, 0.1, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.2, 0.7, 0.28, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 10.0
+content_margin_top = 12.0
+content_margin_right = 10.0
+content_margin_bottom = 12.0
+
+[node name="SlotMachine" type="PanelContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_script")
-reel_scene = ExtResource("2_reel")
-symbol_set = ExtResource("3_symbols")
-pay_table = ExtResource("4_paytable")
-upgrade_tree = ExtResource("5_upgrades")
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("Cabinet")
+script = ExtResource("1_machine")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.078, 0.071, 0.122, 1)
-
-[node name="CenterContainer" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Cabinet" type="PanelContainer" parent="CenterContainer"]
+[node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_type_variation = &"Cabinet"
+theme_override_constants/separation = 16
+alignment = 1
 
-[node name="Layout" type="VBoxContainer" parent="CenterContainer/Cabinet"]
+[node name="Title" type="Label" parent="Layout"]
 layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="Banner" type="PanelContainer" parent="CenterContainer/Cabinet/Layout"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_type_variation = &"Banner"
-
-[node name="Title" type="Label" parent="CenterContainer/Cabinet/Layout/Banner"]
-layout_mode = 2
-theme_type_variation = &"CabinetHeadline"
-text = "THE CASINO"
-horizontal_alignment = 1
-
-[node name="ReelFrame" type="PanelContainer" parent="CenterContainer/Cabinet/Layout"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_type_variation = &"ReelFrame"
-
-[node name="ReelRow" type="HBoxContainer" parent="CenterContainer/Cabinet/Layout/ReelFrame"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="PayoutSlot" parent="CenterContainer/Cabinet/Layout" instance=ExtResource("6_payout")]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="WinLabel" type="Label" parent="CenterContainer/Cabinet/Layout"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
-theme_type_variation = &"CabinetLabel"
 theme_override_font_sizes/font_size = 20
+text = "SLOTS"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="CreditsLabel" type="Label" parent="CenterContainer/Cabinet/Layout"]
+[node name="ReelRow" type="HBoxContainer" parent="Layout"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"CabinetLabel"
-text = "Credits 1000    Bet 1"
-horizontal_alignment = 1
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="Controls" type="HBoxContainer" parent="CenterContainer/Cabinet/Layout"]
+[node name="SpinButton" type="Button" parent="Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 36)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 12
-
-[node name="SpinButton" type="Button" parent="CenterContainer/Cabinet/Layout/Controls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 52)
-layout_mode = 2
 text = "SPIN"
-
-[node name="AutoButton" type="Button" parent="CenterContainer/Cabinet/Layout/Controls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 52)
-layout_mode = 2
-visible = false
-toggle_mode = true
-text = "AUTOMATIC"
-
-[node name="AutoTimer" type="Timer" parent="."]
-unique_name_in_owner = true
-wait_time = 0.5
-one_shot = true

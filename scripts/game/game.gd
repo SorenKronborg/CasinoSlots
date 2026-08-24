@@ -1,52 +1,45 @@
 class_name Game
-extends Node
+extends Control
 
-## Owns the run: the wallet, the upgrades bought with it, and navigation between
-## the machine and the screens layered on top of it. The machine itself knows
-## nothing about those screens.
+@onready var _level: LevelGraph = %LevelGraph
+@onready var _slots: SlotMachine = %SlotMachine
+@onready var _flight: ResourceFlight = %ResourceFlight
 
-const UPGRADES_SCENE := "res://scenes/upgrades/upgrades.tscn"
+const MATCH_SECONDS := 180.0
 
-@export var upgrade_tree: UpgradeTree
-
-@onready var _upgrades_button: Button = %UpgradesButton
-@onready var _overlay_layer: CanvasLayer = $OverlayLayer
-
-var _state: RunState
-var _upgrades: Upgrades
-
-
-func _enter_tree() -> void:
-	# A parent enters the tree before its children are ready, which is what makes
-	# it safe to hand the state over before the machine builds itself from it.
-	_state = RunState.new(upgrade_tree)
-	$SlotMachine.state = _state
+var _state := RunState.new()
+var _time_left := MATCH_SECONDS
 
 
 func _ready() -> void:
-	_upgrades_button.pressed.connect(_open_upgrades)
+	_level.bind_run_state(_state)
+	_level.node_completed.connect(_on_node_completed)
+	_slots.spin_resolved.connect(_on_spin_resolved)
+	_level.set_time_left(_time_left)
 
 
-func _open_upgrades() -> void:
-	if _upgrades != null:
+func _process(delta: float) -> void:
+	if _time_left <= 0.0:
 		return
-
-	_upgrades = load(UPGRADES_SCENE).instantiate() as Upgrades
-	_upgrades.state = _state
-	# Pausing is what stops a spacebar press behind the overlay from spinning,
-	# and it freezes any spin already in flight rather than letting reels land
-	# out of sight.
-	_upgrades.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
-	_upgrades.closed.connect(_close_upgrades)
-	_overlay_layer.add_child(_upgrades)
-	get_tree().paused = true
+	_time_left = maxf(_time_left - delta, 0.0)
+	_level.set_time_left(_time_left)
 
 
-func _close_upgrades() -> void:
-	if _upgrades == null:
-		return
+func _on_node_completed(_id: StringName) -> void:
+	_state.add_prestige(1)
 
-	get_tree().paused = false
-	_upgrades.queue_free()
-	_upgrades = null
-	_upgrades_button.grab_focus()
+
+func _on_spin_resolved(symbols: Array[int]) -> void:
+	var payout := SlotPayout.from_spin(symbols)
+	_state.apply_payout(payout)
+	var origin := _slots.payout_origin()
+	for kind in Symbols.COUNT:
+		var amount: int = payout.symbols[kind]
+		if amount <= 0:
+			continue
+		var deliveries: Array[LockDelivery] = _level.allocate_winnings(kind, amount)
+		for delivery in deliveries:
+			var edge := delivery.edge
+			_flight.fly(kind, delivery.count, origin, edge.lock_center_global(), func() -> void:
+				_level.credit_lock(edge, 1)
+			)

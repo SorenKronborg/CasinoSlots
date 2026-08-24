@@ -1,26 +1,18 @@
 class_name Symbols
-extends RefCounted
+extends Object
 
-## Authoritative symbol ordering. The index of each entry is used directly as
-## the strip value, the SymbolSet array index, and the SlotMath count-vector
-## index, so reordering this enum invalidates every authored resource.
-enum Kind {
-	HEART,
-	COIN,
-	BAR,
-	SEVEN,
-	DIAMOND,
-	WILD,
-	JACKPOT,
-}
+enum Kind { CHERRY, WATERMELON, BELL, SEVEN, STAR }
 
+const COUNT := 5
 
-static func count() -> int:
-	return Kind.size()
+const PATHS: PackedStringArray = [
+	"res://assets/icons/cherry.svg",
+	"res://assets/icons/watermelon.svg",
+	"res://assets/icons/bell.svg",
+	"res://assets/icons/seven.svg",
+	"res://assets/icons/star.png",
+]
 
 
-static func name_of(kind: int) -> String:
-	var names: Array = Kind.keys()
-	if kind < 0 or kind >= names.size():
-		return "UNKNOWN(%d)" % kind
-	return String(names[kind])
+static func texture(kind: int) -> Texture2D:
+	return load(PATHS[kind]) as Texture2D
