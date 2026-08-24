@@ -1,0 +1,63 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/graph_node.gd" id="1_node"]
+
+[sub_resource type="StyleBoxFlat" id="CircleNormal"]
+bg_color = Color(1, 0.85, 0.2, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.15, 0.15, 0.15, 1)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+
+[sub_resource type="StyleBoxFlat" id="CircleHover"]
+bg_color = Color(1, 0.92, 0.4, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.15, 0.15, 0.15, 1)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+
+[sub_resource type="StyleBoxFlat" id="CirclePressed"]
+bg_color = Color(0.92, 0.72, 0.12, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.15, 0.15, 0.15, 1)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+
+[sub_resource type="StyleBoxFlat" id="CircleDisabled"]
+bg_color = Color(0.55, 0.55, 0.55, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25, 0.25, 0.25, 1)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+
+[node name="GraphNode" type="Button"]
+custom_minimum_size = Vector2(72, 72)
+theme_override_colors/font_color = Color(0.12, 0.12, 0.12, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("CircleNormal")
+theme_override_styles/hover = SubResource("CircleHover")
+theme_override_styles/pressed = SubResource("CirclePressed")
+theme_override_styles/disabled = SubResource("CircleDisabled")
+text = "Node"
+script = ExtResource("1_node")
