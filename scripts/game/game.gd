@@ -40,6 +40,7 @@ func _on_spin_resolved(symbols: Array[int]) -> void:
 		var deliveries: Array[LockDelivery] = _level.allocate_winnings(kind, amount)
 		for delivery in deliveries:
 			var edge := delivery.edge
-			_flight.fly(kind, delivery.count, origin, edge.lock_center_global(), func() -> void:
-				_level.credit_lock(edge, 1)
+			var delivery_kind := delivery.kind
+			_flight.fly(delivery_kind, delivery.count, origin, edge.lock_center_global(delivery_kind), func() -> void:
+				_level.credit_lock(edge, delivery_kind, 1)
 			)

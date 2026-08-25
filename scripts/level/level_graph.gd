@@ -113,10 +113,9 @@ func _refresh() -> void:
 
 
 func is_lock_open_for(kind: int, edge: GraphEdgeView) -> bool:
-	if not edge.locked or edge.open_capacity() <= 0 or edge.lock_symbol != kind:
-		return false
-	var from_node: GraphNodeView = _nodes.get(edge.from_id)
-	return from_node != null and from_node.is_paid()
+	## Locks accept resources immediately; paying the source circle is no longer
+	## a prerequisite.
+	return edge.locked and edge.open_capacity(kind) > 0
 
 
 ## Reserves as much of a win as the open locks can still take. Anything left
@@ -129,19 +128,19 @@ func allocate_winnings(kind: int, amount: int) -> Array[LockDelivery]:
 			break
 		if not is_lock_open_for(kind, edge):
 			continue
-		var taken := edge.reserve(leftover)
+		var taken := edge.reserve(kind, leftover)
 		if taken <= 0:
 			continue
-		deliveries.append(LockDelivery.new(edge, taken))
+		deliveries.append(LockDelivery.new(edge, kind, taken))
 		leftover -= taken
 	return deliveries
 
 
-func credit_lock(edge: GraphEdgeView, amount: int) -> void:
+func credit_lock(edge: GraphEdgeView, kind: int, amount: int) -> void:
 	if edge == null:
 		return
-	edge.apply_payment(amount)
-	if edge.remaining <= 0 and edge.locked:
+	edge.apply_payment(kind, amount)
+	if edge.is_fully_paid() and edge.locked:
 		unlock_edge(edge.edge_id)
 
 

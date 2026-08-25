@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelDefinition" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="LevelDefinition" load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/level_definition.gd" id="1_def"]
 [ext_resource type="Script" path="res://scripts/data/graph_node_data.gd" id="2_node"]
@@ -44,6 +44,70 @@ label = "W"
 is_start = false
 coin_cost = 20
 
+[sub_resource type="Resource" id="NodeNorthWest"]
+script = ExtResource("2_node")
+id = &"north_west"
+position = Vector2(360, 45)
+label = "NW"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeNorthEast"]
+script = ExtResource("2_node")
+id = &"north_east"
+position = Vector2(600, 45)
+label = "NE"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeEastNorth"]
+script = ExtResource("2_node")
+id = &"east_north"
+position = Vector2(850, 225)
+label = "EN"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeEastSouth"]
+script = ExtResource("2_node")
+id = &"east_south"
+position = Vector2(850, 455)
+label = "ES"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeSouthEast"]
+script = ExtResource("2_node")
+id = &"south_east"
+position = Vector2(600, 635)
+label = "SE"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeSouthWest"]
+script = ExtResource("2_node")
+id = &"south_west"
+position = Vector2(360, 635)
+label = "SW"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeWestSouth"]
+script = ExtResource("2_node")
+id = &"west_south"
+position = Vector2(110, 455)
+label = "WS"
+is_start = false
+coin_cost = 40
+
+[sub_resource type="Resource" id="NodeWestNorth"]
+script = ExtResource("2_node")
+id = &"west_north"
+position = Vector2(110, 225)
+label = "WN"
+is_start = false
+coin_cost = 40
+
 [sub_resource type="Resource" id="EdgeNorth"]
 script = ExtResource("3_edge")
 id = &"to_north"
@@ -80,7 +144,95 @@ locked = true
 lock_symbol = 3
 lock_amount = 10
 
+[sub_resource type="Resource" id="EdgeNorthWest"]
+script = ExtResource("3_edge")
+id = &"north_to_north_west"
+from_id = &"north"
+to_id = &"north_west"
+locked = true
+lock_symbol = 0
+lock_amount = 20
+lock_symbol_2 = 1
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeNorthEast"]
+script = ExtResource("3_edge")
+id = &"north_to_north_east"
+from_id = &"north"
+to_id = &"north_east"
+locked = true
+lock_symbol = 1
+lock_amount = 20
+lock_symbol_2 = 2
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeEastNorth"]
+script = ExtResource("3_edge")
+id = &"east_to_east_north"
+from_id = &"east"
+to_id = &"east_north"
+locked = true
+lock_symbol = 2
+lock_amount = 20
+lock_symbol_2 = 3
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeEastSouth"]
+script = ExtResource("3_edge")
+id = &"east_to_east_south"
+from_id = &"east"
+to_id = &"east_south"
+locked = true
+lock_symbol = 3
+lock_amount = 20
+lock_symbol_2 = 4
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeSouthEast"]
+script = ExtResource("3_edge")
+id = &"south_to_south_east"
+from_id = &"south"
+to_id = &"south_east"
+locked = true
+lock_symbol = 0
+lock_amount = 20
+lock_symbol_2 = 1
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeSouthWest"]
+script = ExtResource("3_edge")
+id = &"south_to_south_west"
+from_id = &"south"
+to_id = &"south_west"
+locked = true
+lock_symbol = 1
+lock_amount = 20
+lock_symbol_2 = 2
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeWestSouth"]
+script = ExtResource("3_edge")
+id = &"west_to_west_south"
+from_id = &"west"
+to_id = &"west_south"
+locked = true
+lock_symbol = 2
+lock_amount = 20
+lock_symbol_2 = 3
+lock_amount_2 = 20
+
+[sub_resource type="Resource" id="EdgeWestNorth"]
+script = ExtResource("3_edge")
+id = &"west_to_west_north"
+from_id = &"west"
+to_id = &"west_north"
+locked = true
+lock_symbol = 3
+lock_amount = 20
+lock_symbol_2 = 4
+lock_amount_2 = 20
+
 [resource]
 script = ExtResource("1_def")
-nodes = Array[ExtResource("2_node")]([SubResource("NodeCenter"), SubResource("NodeNorth"), SubResource("NodeEast"), SubResource("NodeSouth"), SubResource("NodeWest")])
-edges = Array[ExtResource("3_edge")]([SubResource("EdgeNorth"), SubResource("EdgeEast"), SubResource("EdgeSouth"), SubResource("EdgeWest")])
+nodes = Array[ExtResource("2_node")]([SubResource("NodeCenter"), SubResource("NodeNorth"), SubResource("NodeEast"), SubResource("NodeSouth"), SubResource("NodeWest"), SubResource("NodeNorthWest"), SubResource("NodeNorthEast"), SubResource("NodeEastNorth"), SubResource("NodeEastSouth"), SubResource("NodeSouthEast"), SubResource("NodeSouthWest"), SubResource("NodeWestSouth"), SubResource("NodeWestNorth")])
+edges = Array[ExtResource("3_edge")]([SubResource("EdgeNorth"), SubResource("EdgeEast"), SubResource("EdgeSouth"), SubResource("EdgeWest"), SubResource("EdgeNorthWest"), SubResource("EdgeNorthEast"), SubResource("EdgeEastNorth"), SubResource("EdgeEastSouth"), SubResource("EdgeSouthEast"), SubResource("EdgeSouthWest"), SubResource("EdgeWestSouth"), SubResource("EdgeWestNorth")])
