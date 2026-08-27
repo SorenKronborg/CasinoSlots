@@ -1,16 +1,26 @@
 class_name GraphEdgeView
 extends Control
 
+signal lock_clicked(id: StringName)
+
 var edge_id: StringName
 var from_id: StringName
 var to_id: StringName
 var locked: bool = true
 var lock_symbols: PackedInt32Array = PackedInt32Array()
+var totals: PackedInt32Array = PackedInt32Array()
 var remaining: PackedInt32Array = PackedInt32Array()
+## How many locks deep this edge sits from the start node, used to pay the
+## nearest locks first.
+var depth: int = 0
+## Player-chosen target: prioritized locks are filled before all others.
+var prioritized: bool = false
 var _in_flight: PackedInt32Array = PackedInt32Array()
 
 var _line: Line2D
 var _lock_panel: PanelContainer
+var _style_idle: StyleBoxFlat
+var _style_priority: StyleBoxFlat
 var _requirement_labels: Array[Label] = []
 var _requirement_views: Array[Control] = []
 
@@ -24,16 +34,23 @@ func _ready() -> void:
 	_line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	_line.end_cap_mode = Line2D.LINE_CAP_ROUND
 	add_child(_line)
+	_style_idle = _make_style(Color(0.96, 0.96, 0.96, 0.96), Color(0.25, 0.25, 0.25, 1))
+	_style_priority = _make_style(Color(0.44, 0.85, 0.45, 0.98), Color(0.11, 0.42, 0.14, 1))
 	_lock_panel = PanelContainer.new()
 	_lock_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lock_panel.add_theme_stylebox_override("panel", _style_idle)
+	_lock_panel.gui_input.connect(_on_lock_gui_input)
+	add_child(_lock_panel)
+
+
+func _make_style(background: Color, border: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.96, 0.96, 0.96, 0.96)
+	style.bg_color = background
 	style.set_border_width_all(2)
-	style.border_color = Color(0.25, 0.25, 0.25, 1)
+	style.border_color = border
 	style.set_corner_radius_all(7)
 	style.set_content_margin_all(5)
-	_lock_panel.add_theme_stylebox_override("panel", style)
-	add_child(_lock_panel)
+	return style
 
 
 func setup(data: GraphEdgeData, from_center: Vector2, to_center: Vector2) -> void:
@@ -43,10 +60,11 @@ func setup(data: GraphEdgeData, from_center: Vector2, to_center: Vector2) -> voi
 	if _line == null:
 		await ready
 	lock_symbols = PackedInt32Array([data.lock_symbol])
-	remaining = PackedInt32Array([data.lock_amount])
+	totals = PackedInt32Array([data.lock_amount])
 	if data.lock_symbol_2 >= 0 and data.lock_amount_2 > 0:
 		lock_symbols.append(data.lock_symbol_2)
-		remaining.append(data.lock_amount_2)
+		totals.append(data.lock_amount_2)
+	remaining = totals.duplicate()
 	_in_flight.resize(lock_symbols.size())
 	_build_requirements()
 	set_endpoints(from_center, to_center)
@@ -60,10 +78,12 @@ func _build_requirements() -> void:
 	_requirement_views.clear()
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 7)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_lock_panel.add_child(row)
 	for index in lock_symbols.size():
 		var requirement := HBoxContainer.new()
 		requirement.add_theme_constant_override("separation", 2)
+		requirement.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(requirement)
 		var icon := TextureRect.new()
 		icon.texture = Symbols.texture(lock_symbols[index])
@@ -95,6 +115,26 @@ func set_locked(value: bool) -> void:
 		_lock_panel.visible = locked
 	if _line:
 		_line.default_color = Color(0.12, 0.12, 0.12, 1) if locked else Color(0.35, 0.7, 0.3, 1)
+
+
+## Only locks that can currently take resources respond to clicks.
+func set_selectable(value: bool) -> void:
+	if _lock_panel == null:
+		return
+	_lock_panel.mouse_filter = Control.MOUSE_FILTER_STOP if value else Control.MOUSE_FILTER_IGNORE
+	_lock_panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if value else Control.CURSOR_ARROW
+
+
+func set_prioritized(value: bool) -> void:
+	prioritized = value
+	if _lock_panel:
+		_lock_panel.add_theme_stylebox_override("panel", _style_priority if prioritized else _style_idle)
+
+
+func _on_lock_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_lock_panel.accept_event()
+		lock_clicked.emit(edge_id)
 
 
 func lock_center_global(kind: int) -> Vector2:
@@ -142,4 +182,4 @@ func is_fully_paid() -> bool:
 
 func _refresh_labels() -> void:
 	for index in _requirement_labels.size():
-		_requirement_labels[index].text = str(remaining[index])
+		_requirement_labels[index].text = "%d/%d" % [totals[index] - remaining[index], totals[index]]

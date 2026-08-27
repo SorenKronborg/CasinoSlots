@@ -79,7 +79,28 @@ func _build() -> void:
 		_edges_layer.add_child(edge)
 		edge.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		edge.setup(edge_data, from_node.center(), to_node.center())
+		edge.lock_clicked.connect(_on_lock_clicked)
 		_edges[edge_data.id] = edge
+	_assign_depths()
+
+
+## Walks outward from the start node so every edge knows which layer it is in.
+func _assign_depths() -> void:
+	var node_depth: Dictionary = {}
+	var frontier: Array[StringName] = []
+	for node: GraphNodeView in _nodes.values():
+		if node.is_start:
+			node_depth[node.node_id] = 0
+			frontier.append(node.node_id)
+	while not frontier.is_empty():
+		var current: StringName = frontier.pop_front()
+		for edge: GraphEdgeView in _edges.values():
+			if edge.from_id != current or node_depth.has(edge.to_id):
+				continue
+			node_depth[edge.to_id] = int(node_depth[current]) + 1
+			frontier.append(edge.to_id)
+	for edge: GraphEdgeView in _edges.values():
+		edge.depth = int(node_depth.get(edge.from_id, 0)) + 1
 
 
 ## Keeps the authored layout centred in whatever space the panel gets, so the
@@ -107,27 +128,51 @@ func _layout_board() -> void:
 
 func _refresh() -> void:
 	for node: GraphNodeView in _nodes.values():
-		node.set_clickable(_can_pay(node))
+		node.apply_state(_is_reachable(node))
+	for edge: GraphEdgeView in _edges.values():
+		var selectable := can_receive_resources(edge)
+		edge.set_selectable(selectable)
+		if not selectable and edge.prioritized:
+			edge.set_prioritized(false)
 	if _hud:
 		_hud.refresh(_run_state)
 
 
+## True while this lock still needs something and every lock leading into it
+## has already been opened.
+func can_receive_resources(edge: GraphEdgeView) -> bool:
+	if not edge.locked or edge.is_fully_paid():
+		return false
+	for other: GraphEdgeView in _edges.values():
+		if other.to_id == edge.from_id and other.locked:
+			return false
+	return true
+
+
+## A lock only accepts resources once every lock leading into it has been
+## opened. Paying the source circle is not a prerequisite.
 func is_lock_open_for(kind: int, edge: GraphEdgeView) -> bool:
-	## Locks accept resources immediately; paying the source circle is no longer
-	## a prerequisite.
-	return edge.locked and edge.open_capacity(kind) > 0
+	return can_receive_resources(edge) and edge.open_capacity(kind) > 0
 
 
-## Reserves as much of a win as the open locks can still take. Anything left
-## over has nowhere to go and is simply dropped by the caller.
+## Reserves as much of a win as the open locks can still take. Locks the player
+## marked as priority are filled first, then the ones closest to the start.
+## Anything left over has nowhere to go and is dropped by the caller.
 func allocate_winnings(kind: int, amount: int) -> Array[LockDelivery]:
 	var deliveries: Array[LockDelivery] = []
-	var leftover := amount
+	var candidates: Array[GraphEdgeView] = []
 	for edge: GraphEdgeView in _edges.values():
+		if is_lock_open_for(kind, edge):
+			candidates.append(edge)
+	candidates.sort_custom(func(a: GraphEdgeView, b: GraphEdgeView) -> bool:
+		if a.prioritized != b.prioritized:
+			return a.prioritized
+		return a.depth < b.depth
+	)
+	var leftover := amount
+	for edge in candidates:
 		if leftover <= 0:
 			break
-		if not is_lock_open_for(kind, edge):
-			continue
 		var taken := edge.reserve(kind, leftover)
 		if taken <= 0:
 			continue
@@ -149,6 +194,10 @@ func _can_pay(node: GraphNodeView) -> bool:
 		return false
 	if _run_state == null or _run_state.coins < 1:
 		return false
+	return _is_reachable(node)
+
+
+func _is_reachable(node: GraphNodeView) -> bool:
 	if node.is_start:
 		return true
 	for edge: GraphEdgeView in _edges.values():
@@ -165,3 +214,10 @@ func _on_node_pressed(id: StringName) -> void:
 func _on_node_completed(id: StringName) -> void:
 	node_completed.emit(id)
 	_refresh()
+
+
+func _on_lock_clicked(edge_id: StringName) -> void:
+	var edge: GraphEdgeView = _edges.get(edge_id)
+	if edge == null or not can_receive_resources(edge):
+		return
+	edge.set_prioritized(not edge.prioritized)
