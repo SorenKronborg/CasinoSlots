@@ -15,7 +15,7 @@ coin_cost = 10
 [sub_resource type="Resource" id="NodeNorth"]
 script = ExtResource("2_node")
 id = &"north"
-position = Vector2(480, 150)
+position = Vector2(494, 146)
 label = "N"
 is_start = false
 coin_cost = 20
@@ -23,7 +23,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeEast"]
 script = ExtResource("2_node")
 id = &"east"
-position = Vector2(700, 340)
+position = Vector2(706, 356)
 label = "E"
 is_start = false
 coin_cost = 20
@@ -31,7 +31,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeSouth"]
 script = ExtResource("2_node")
 id = &"south"
-position = Vector2(480, 530)
+position = Vector2(468, 538)
 label = "S"
 is_start = false
 coin_cost = 20
@@ -39,7 +39,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeWest"]
 script = ExtResource("2_node")
 id = &"west"
-position = Vector2(260, 340)
+position = Vector2(252, 326)
 label = "W"
 is_start = false
 coin_cost = 20
@@ -47,7 +47,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeNorthWest"]
 script = ExtResource("2_node")
 id = &"north_west"
-position = Vector2(360, 45)
+position = Vector2(342, 62)
 label = "NW"
 is_start = false
 coin_cost = 40
@@ -55,7 +55,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeNorthEast"]
 script = ExtResource("2_node")
 id = &"north_east"
-position = Vector2(600, 45)
+position = Vector2(618, 34)
 label = "NE"
 is_start = false
 coin_cost = 40
@@ -63,7 +63,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeEastNorth"]
 script = ExtResource("2_node")
 id = &"east_north"
-position = Vector2(850, 225)
+position = Vector2(866, 210)
 label = "EN"
 is_start = false
 coin_cost = 40
@@ -71,7 +71,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeEastSouth"]
 script = ExtResource("2_node")
 id = &"east_south"
-position = Vector2(850, 455)
+position = Vector2(834, 474)
 label = "ES"
 is_start = false
 coin_cost = 40
@@ -79,7 +79,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeSouthEast"]
 script = ExtResource("2_node")
 id = &"south_east"
-position = Vector2(600, 635)
+position = Vector2(616, 648)
 label = "SE"
 is_start = false
 coin_cost = 40
@@ -87,7 +87,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeSouthWest"]
 script = ExtResource("2_node")
 id = &"south_west"
-position = Vector2(360, 635)
+position = Vector2(344, 622)
 label = "SW"
 is_start = false
 coin_cost = 40
@@ -95,7 +95,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeWestSouth"]
 script = ExtResource("2_node")
 id = &"west_south"
-position = Vector2(110, 455)
+position = Vector2(96, 438)
 label = "WS"
 is_start = false
 coin_cost = 40
@@ -103,7 +103,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeWestNorth"]
 script = ExtResource("2_node")
 id = &"west_north"
-position = Vector2(110, 225)
+position = Vector2(124, 240)
 label = "WN"
 is_start = false
 coin_cost = 40
@@ -114,8 +114,8 @@ id = &"to_north"
 from_id = &"center"
 to_id = &"north"
 locked = true
-lock_symbol = 0
-lock_amount = 10
+lock_symbols = PackedInt32Array(0)
+lock_amounts = PackedInt32Array(10)
 
 [sub_resource type="Resource" id="EdgeEast"]
 script = ExtResource("3_edge")
@@ -123,8 +123,8 @@ id = &"to_east"
 from_id = &"center"
 to_id = &"east"
 locked = true
-lock_symbol = 1
-lock_amount = 10
+lock_symbols = PackedInt32Array(1)
+lock_amounts = PackedInt32Array(10)
 
 [sub_resource type="Resource" id="EdgeSouth"]
 script = ExtResource("3_edge")
@@ -132,8 +132,8 @@ id = &"to_south"
 from_id = &"center"
 to_id = &"south"
 locked = true
-lock_symbol = 2
-lock_amount = 10
+lock_symbols = PackedInt32Array(2)
+lock_amounts = PackedInt32Array(10)
 
 [sub_resource type="Resource" id="EdgeWest"]
 script = ExtResource("3_edge")
@@ -141,8 +141,8 @@ id = &"to_west"
 from_id = &"center"
 to_id = &"west"
 locked = true
-lock_symbol = 3
-lock_amount = 10
+lock_symbols = PackedInt32Array(3)
+lock_amounts = PackedInt32Array(10)
 
 [sub_resource type="Resource" id="EdgeNorthWest"]
 script = ExtResource("3_edge")
@@ -150,10 +150,8 @@ id = &"north_to_north_west"
 from_id = &"north"
 to_id = &"north_west"
 locked = true
-lock_symbol = 0
-lock_amount = 20
-lock_symbol_2 = 1
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(0, 4)
+lock_amounts = PackedInt32Array(20, 10)
 
 [sub_resource type="Resource" id="EdgeNorthEast"]
 script = ExtResource("3_edge")
@@ -161,10 +159,8 @@ id = &"north_to_north_east"
 from_id = &"north"
 to_id = &"north_east"
 locked = true
-lock_symbol = 1
-lock_amount = 20
-lock_symbol_2 = 2
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(1)
+lock_amounts = PackedInt32Array(20)
 
 [sub_resource type="Resource" id="EdgeEastNorth"]
 script = ExtResource("3_edge")
@@ -172,10 +168,8 @@ id = &"east_to_east_north"
 from_id = &"east"
 to_id = &"east_north"
 locked = true
-lock_symbol = 2
-lock_amount = 20
-lock_symbol_2 = 3
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(2)
+lock_amounts = PackedInt32Array(20)
 
 [sub_resource type="Resource" id="EdgeEastSouth"]
 script = ExtResource("3_edge")
@@ -183,10 +177,8 @@ id = &"east_to_east_south"
 from_id = &"east"
 to_id = &"east_south"
 locked = true
-lock_symbol = 3
-lock_amount = 20
-lock_symbol_2 = 4
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(3)
+lock_amounts = PackedInt32Array(20)
 
 [sub_resource type="Resource" id="EdgeSouthEast"]
 script = ExtResource("3_edge")
@@ -194,10 +186,8 @@ id = &"south_to_south_east"
 from_id = &"south"
 to_id = &"south_east"
 locked = true
-lock_symbol = 0
-lock_amount = 20
-lock_symbol_2 = 1
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(0)
+lock_amounts = PackedInt32Array(20)
 
 [sub_resource type="Resource" id="EdgeSouthWest"]
 script = ExtResource("3_edge")
@@ -205,10 +195,8 @@ id = &"south_to_south_west"
 from_id = &"south"
 to_id = &"south_west"
 locked = true
-lock_symbol = 1
-lock_amount = 20
-lock_symbol_2 = 2
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(1)
+lock_amounts = PackedInt32Array(20)
 
 [sub_resource type="Resource" id="EdgeWestSouth"]
 script = ExtResource("3_edge")
@@ -216,10 +204,8 @@ id = &"west_to_west_south"
 from_id = &"west"
 to_id = &"west_south"
 locked = true
-lock_symbol = 2
-lock_amount = 20
-lock_symbol_2 = 3
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(2)
+lock_amounts = PackedInt32Array(20)
 
 [sub_resource type="Resource" id="EdgeWestNorth"]
 script = ExtResource("3_edge")
@@ -227,10 +213,8 @@ id = &"west_to_west_north"
 from_id = &"west"
 to_id = &"west_north"
 locked = true
-lock_symbol = 3
-lock_amount = 20
-lock_symbol_2 = 4
-lock_amount_2 = 20
+lock_symbols = PackedInt32Array(3)
+lock_amounts = PackedInt32Array(20)
 
 [resource]
 script = ExtResource("1_def")

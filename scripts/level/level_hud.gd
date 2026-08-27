@@ -4,6 +4,7 @@ extends PanelContainer
 const HEART_TEXTURE := preload("res://assets/icons/heart.png")
 const COIN_TEXTURE := preload("res://assets/icons/coin.png")
 
+var _coins_icon: TextureRect
 var _coins_label: Label
 var _prestige_label: Label
 
@@ -19,9 +20,17 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	add_child(row)
-	_coins_label = _add_stat(row, COIN_TEXTURE)
-	_prestige_label = _add_stat(row, HEART_TEXTURE)
+	_coins_icon = _add_icon(row, COIN_TEXTURE)
+	_coins_label = _add_label(row)
+	_add_icon(row, HEART_TEXTURE)
+	_prestige_label = _add_label(row)
 	refresh(null)
+
+
+func coin_origin() -> Vector2:
+	if _coins_icon == null:
+		return get_global_rect().get_center()
+	return _coins_icon.get_global_rect().get_center()
 
 
 func refresh(state: RunState) -> void:
@@ -35,13 +44,17 @@ func refresh(state: RunState) -> void:
 	_prestige_label.text = str(state.prestige)
 
 
-func _add_stat(row: HBoxContainer, texture: Texture2D) -> Label:
+func _add_icon(row: HBoxContainer, texture: Texture2D) -> TextureRect:
 	var icon := TextureRect.new()
 	icon.texture = texture
 	icon.custom_minimum_size = Vector2(26, 26)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	row.add_child(icon)
+	return icon
+
+
+func _add_label(row: HBoxContainer) -> Label:
 	var label := Label.new()
 	label.text = "0"
 	label.add_theme_color_override("font_color", Color(0.12, 0.12, 0.12, 1))

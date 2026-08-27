@@ -3,10 +3,19 @@ extends Control
 
 signal lock_clicked(id: StringName)
 
+const _COLOR_BLOCKED := Color(0.12, 0.12, 0.12, 1)
+const _COLOR_OPEN := Color(0.35, 0.7, 0.3, 1)
+## How far an edge bows away from a straight line, as a share of its length.
+const BOW_MIN := 0.04
+const BOW_MAX := 0.13
+const CURVE_STEPS := 24
+
 var edge_id: StringName
 var from_id: StringName
 var to_id: StringName
 var locked: bool = true
+## The locks on this edge, ordered from the source circle outwards. Only the
+## first unpaid one takes resources; anything behind it stays hidden.
 var lock_symbols: PackedInt32Array = PackedInt32Array()
 var totals: PackedInt32Array = PackedInt32Array()
 var remaining: PackedInt32Array = PackedInt32Array()
@@ -18,29 +27,28 @@ var prioritized: bool = false
 var _in_flight: PackedInt32Array = PackedInt32Array()
 
 var _line: Line2D
-var _lock_panel: PanelContainer
+var _lock_panels: Array[PanelContainer] = []
+var _lock_labels: Array[Label] = []
+var _from_center: Vector2 = Vector2.ZERO
+var _to_center: Vector2 = Vector2.ZERO
+var _control_point: Vector2 = Vector2.ZERO
 var _style_idle: StyleBoxFlat
 var _style_priority: StyleBoxFlat
-var _requirement_labels: Array[Label] = []
-var _requirement_views: Array[Control] = []
+var _style_opened: StyleBoxFlat
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_line = Line2D.new()
 	_line.width = 4.0
-	_line.default_color = Color(0.12, 0.12, 0.12, 1)
+	_line.default_color = _COLOR_BLOCKED
 	_line.joint_mode = Line2D.LINE_JOINT_ROUND
 	_line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	_line.end_cap_mode = Line2D.LINE_CAP_ROUND
 	add_child(_line)
 	_style_idle = _make_style(Color(0.96, 0.96, 0.96, 0.96), Color(0.25, 0.25, 0.25, 1))
 	_style_priority = _make_style(Color(0.44, 0.85, 0.45, 0.98), Color(0.11, 0.42, 0.14, 1))
-	_lock_panel = PanelContainer.new()
-	_lock_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lock_panel.add_theme_stylebox_override("panel", _style_idle)
-	_lock_panel.gui_input.connect(_on_lock_gui_input)
-	add_child(_lock_panel)
+	_style_opened = _make_style(Color(0.82, 0.9, 0.82, 0.9), Color(0.35, 0.7, 0.3, 1))
 
 
 func _make_style(background: Color, border: Color) -> StyleBoxFlat:
@@ -59,127 +67,198 @@ func setup(data: GraphEdgeData, from_center: Vector2, to_center: Vector2) -> voi
 	to_id = data.to_id
 	if _line == null:
 		await ready
-	lock_symbols = PackedInt32Array([data.lock_symbol])
-	totals = PackedInt32Array([data.lock_amount])
-	if data.lock_symbol_2 >= 0 and data.lock_amount_2 > 0:
-		lock_symbols.append(data.lock_symbol_2)
-		totals.append(data.lock_amount_2)
+	lock_symbols = data.lock_symbols.duplicate()
+	totals = data.lock_amounts.duplicate()
+	totals.resize(lock_symbols.size())
 	remaining = totals.duplicate()
+	_in_flight = PackedInt32Array()
 	_in_flight.resize(lock_symbols.size())
-	_build_requirements()
+	_build_locks()
 	set_endpoints(from_center, to_center)
 	set_locked(data.locked)
 
 
-func _build_requirements() -> void:
-	for child in _lock_panel.get_children():
-		child.queue_free()
-	_requirement_labels.clear()
-	_requirement_views.clear()
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 7)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lock_panel.add_child(row)
+func _build_locks() -> void:
+	for panel in _lock_panels:
+		panel.queue_free()
+	_lock_panels.clear()
+	_lock_labels.clear()
 	for index in lock_symbols.size():
-		var requirement := HBoxContainer.new()
-		requirement.add_theme_constant_override("separation", 2)
-		requirement.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(requirement)
+		var panel := PanelContainer.new()
+		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_theme_stylebox_override("panel", _style_idle)
+		panel.gui_input.connect(_on_lock_gui_input.bind(panel))
+		add_child(panel)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 2)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(row)
 		var icon := TextureRect.new()
 		icon.texture = Symbols.texture(lock_symbols[index])
 		icon.custom_minimum_size = Vector2(22, 22)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		requirement.add_child(icon)
+		row.add_child(icon)
 		var label := Label.new()
 		label.add_theme_color_override("font_color", Color(0.1, 0.1, 0.1, 1))
 		label.add_theme_font_size_override("font_size", 12)
-		requirement.add_child(label)
-		_requirement_labels.append(label)
-		_requirement_views.append(requirement)
-	_refresh_labels()
+		row.add_child(label)
+		_lock_panels.append(panel)
+		_lock_labels.append(label)
+	_refresh_locks()
 
 
+## Spreads the locks evenly along the edge so a chain of them reads outward from
+## the circle the player already owns.
 func set_endpoints(from_center: Vector2, to_center: Vector2) -> void:
 	if _line == null:
 		return
-	_line.points = PackedVector2Array([from_center, to_center])
-	var midpoint := from_center.lerp(to_center, 0.5)
-	_lock_panel.reset_size()
-	_lock_panel.position = midpoint - _lock_panel.size * 0.5
+	_from_center = from_center
+	_to_center = to_center
+	_control_point = _pick_control_point()
+	var spacing := float(_lock_panels.size() + 1)
+	for index in _lock_panels.size():
+		var panel := _lock_panels[index]
+		panel.reset_size()
+		var along := float(index + 1) / spacing
+		panel.position = _point_at(along) - panel.size * 0.5
+	_update_line()
+
+
+## Bends the edge to one side so the board reads hand-drawn instead of like a
+## wiring diagram. The bow is derived from the edge id, so it is random-looking
+## but identical every time the level loads.
+func _pick_control_point() -> Vector2:
+	var span := _to_center - _from_center
+	if span.is_zero_approx():
+		return _from_center
+	var noise := int(abs(hash(edge_id)))
+	var bow := BOW_MIN + float(noise % 1000) / 1000.0 * (BOW_MAX - BOW_MIN)
+	if noise % 2 == 1:
+		bow = -bow
+	return _from_center.lerp(_to_center, 0.5) + span.orthogonal().normalized() * span.length() * bow
+
+
+func _point_at(along: float) -> Vector2:
+	return _from_center.bezier_interpolate(_control_point, _control_point, _to_center, along)
 
 
 func set_locked(value: bool) -> void:
 	locked = value
-	if _lock_panel:
-		_lock_panel.visible = locked
 	if _line:
-		_line.default_color = Color(0.12, 0.12, 0.12, 1) if locked else Color(0.35, 0.7, 0.3, 1)
+		_line.default_color = _COLOR_BLOCKED if locked else _COLOR_OPEN
+	_refresh_locks()
+	_update_line()
 
 
-## Only locks that can currently take resources respond to clicks.
-func set_selectable(value: bool) -> void:
-	if _lock_panel == null:
-		return
-	_lock_panel.mouse_filter = Control.MOUSE_FILTER_STOP if value else Control.MOUSE_FILTER_IGNORE
-	_lock_panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if value else Control.CURSOR_ARROW
+## The lock currently taking resources, or -1 when every lock here is paid off.
+func active_lock_index() -> int:
+	for index in remaining.size():
+		if remaining[index] > 0:
+			return index
+	return -1
 
 
-func set_prioritized(value: bool) -> void:
-	prioritized = value
-	if _lock_panel:
-		_lock_panel.add_theme_stylebox_override("panel", _style_priority if prioritized else _style_idle)
+## Whether the far side of this edge has been opened up. An edge is passable
+## only once every lock on it is open.
+func is_passable() -> bool:
+	return not locked
 
 
-func _on_lock_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		_lock_panel.accept_event()
-		lock_clicked.emit(edge_id)
+func is_fully_paid() -> bool:
+	return active_lock_index() < 0
 
 
-func lock_center_global(kind: int) -> Vector2:
-	var index := lock_symbols.find(kind)
-	if index >= 0 and index < _requirement_views.size():
-		return _requirement_views[index].get_global_rect().get_center()
-	if _lock_panel == null:
+func lock_center_global(index: int) -> Vector2:
+	if index < 0 or index >= _lock_panels.size():
 		return global_position
-	return _lock_panel.get_global_rect().get_center()
+	return _lock_panels[index].get_global_rect().get_center()
 
 
 func open_capacity(kind: int) -> int:
-	var index := lock_symbols.find(kind)
-	if index < 0:
+	var index := active_lock_index()
+	if index < 0 or lock_symbols[index] != kind:
 		return 0
 	return remaining[index] - _in_flight[index]
 
 
 func reserve(kind: int, amount: int) -> int:
-	var index := lock_symbols.find(kind)
-	if index < 0:
+	var index := active_lock_index()
+	if index < 0 or lock_symbols[index] != kind:
 		return 0
 	var taken := mini(amount, open_capacity(kind))
 	_in_flight[index] += taken
 	return taken
 
 
-func apply_payment(kind: int, amount: int) -> int:
-	var index := lock_symbols.find(kind)
-	if index < 0:
+func apply_payment(index: int, amount: int) -> int:
+	if index < 0 or index >= remaining.size():
 		return 0
 	var taken := mini(amount, remaining[index])
 	remaining[index] -= taken
 	_in_flight[index] = maxi(_in_flight[index] - taken, 0)
-	_refresh_labels()
+	_refresh_locks()
+	_update_line()
 	return taken
 
 
-func is_fully_paid() -> bool:
-	for amount in remaining:
-		if amount > 0:
-			return false
-	return true
+## Only the lock that can currently take resources responds to clicks.
+func set_selectable(value: bool) -> void:
+	var active := active_lock_index()
+	for index in _lock_panels.size():
+		var panel := _lock_panels[index]
+		var enabled := value and index == active
+		panel.mouse_filter = Control.MOUSE_FILTER_STOP if enabled else Control.MOUSE_FILTER_IGNORE
+		panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if enabled else Control.CURSOR_ARROW
 
 
-func _refresh_labels() -> void:
-	for index in _requirement_labels.size():
-		_requirement_labels[index].text = "%d/%d" % [totals[index] - remaining[index], totals[index]]
+func set_prioritized(value: bool) -> void:
+	prioritized = value
+	_refresh_locks()
+
+
+## Locks past the active one are still hidden, so the player only ever sees the
+## next thing standing in the way.
+func _refresh_locks() -> void:
+	var active := active_lock_index()
+	for index in _lock_panels.size():
+		var panel := _lock_panels[index]
+		_lock_labels[index].text = "%d/%d" % [totals[index] - remaining[index], totals[index]]
+		panel.visible = locked and index <= maxi(active, 0)
+		if remaining[index] <= 0:
+			panel.add_theme_stylebox_override("panel", _style_opened)
+		elif index == active and prioritized:
+			panel.add_theme_stylebox_override("panel", _style_priority)
+		else:
+			panel.add_theme_stylebox_override("panel", _style_idle)
+
+
+## While a lock still blocks the way, the line stops where it meets that lock so
+## the player never sees track leading to a circle that is still hidden.
+func _update_line() -> void:
+	if _line == null:
+		return
+	var limit := 1.0
+	var blocker := Rect2()
+	var index := active_lock_index()
+	if not is_passable() and index >= 0 and index < _lock_panels.size():
+		limit = float(index + 1) / float(_lock_panels.size() + 1)
+		blocker = Rect2(_lock_panels[index].position, _lock_panels[index].size)
+	var points := PackedVector2Array()
+	for step in CURVE_STEPS + 1:
+		var along := float(step) / float(CURVE_STEPS)
+		if along > limit:
+			break
+		var point := _point_at(along)
+		if blocker.has_area() and blocker.has_point(point):
+			break
+		points.append(point)
+	if points.size() < 2:
+		points = PackedVector2Array([_from_center, _point_at(limit)])
+	_line.points = points
+
+
+func _on_lock_gui_input(event: InputEvent, panel: PanelContainer) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		panel.accept_event()
+		lock_clicked.emit(edge_id)

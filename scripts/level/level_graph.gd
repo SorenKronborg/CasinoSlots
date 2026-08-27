@@ -3,6 +3,7 @@ extends PanelContainer
 
 signal node_clicked(id: StringName)
 signal node_completed(id: StringName)
+signal coin_paid(node: GraphNodeView)
 
 const NODE_SCENE := preload("res://scenes/level/graph_node.tscn")
 const EDGE_SCENE := preload("res://scenes/level/graph_edge.tscn")
@@ -17,6 +18,9 @@ const EDGE_SCENE := preload("res://scenes/level/graph_edge.tscn")
 var _nodes: Dictionary = {}
 var _edges: Dictionary = {}
 var _run_state: RunState
+## Nodes the player has opened a path to. Everything past a closed lock stays
+## hidden until that lock is opened.
+var _revealed: Dictionary = {}
 
 
 func _ready() -> void:
@@ -29,9 +33,9 @@ func _ready() -> void:
 	_refresh()
 
 
-func set_time_left(seconds: float) -> void:
+func set_spins_left(count: int) -> void:
 	if _clock:
-		_clock.set_time_left(seconds)
+		_clock.set_spins_left(count)
 
 
 func bind_run_state(state: RunState) -> void:
@@ -52,11 +56,26 @@ func unlock_edge(edge_id: StringName) -> void:
 	_refresh()
 
 
+func coin_origin() -> Vector2:
+	if _hud:
+		return _hud.coin_origin()
+	return Vector2.ZERO
+
+
 func try_pay_node(id: StringName) -> void:
 	var node: GraphNodeView = _nodes.get(id)
-	if node == null or node.is_paid() or not _can_pay(node):
+	if node == null or not _can_pay(node):
+		return
+	if not node.reserve_coin():
 		return
 	if _run_state == null or not _run_state.try_spend_coins(1):
+		node.cancel_reserve()
+		return
+	coin_paid.emit(node)
+
+
+func credit_node(node: GraphNodeView) -> void:
+	if node == null:
 		return
 	node.add_coin()
 
@@ -86,6 +105,15 @@ func _build() -> void:
 
 ## Walks outward from the start node so every edge knows which layer it is in.
 func _assign_depths() -> void:
+	var node_depth := _walk_from_start(false)
+	for edge: GraphEdgeView in _edges.values():
+		edge.depth = int(node_depth.get(edge.from_id, 0)) + 1
+
+
+## Breadth-first walk out from the start node, returning node id to depth. When
+## only_passable is true it stops at closed locks, which is what decides how
+## much of the map the player can see.
+func _walk_from_start(only_passable: bool) -> Dictionary:
 	var node_depth: Dictionary = {}
 	var frontier: Array[StringName] = []
 	for node: GraphNodeView in _nodes.values():
@@ -97,10 +125,11 @@ func _assign_depths() -> void:
 		for edge: GraphEdgeView in _edges.values():
 			if edge.from_id != current or node_depth.has(edge.to_id):
 				continue
+			if only_passable and not edge.is_passable():
+				continue
 			node_depth[edge.to_id] = int(node_depth[current]) + 1
 			frontier.append(edge.to_id)
-	for edge: GraphEdgeView in _edges.values():
-		edge.depth = int(node_depth.get(edge.from_id, 0)) + 1
+	return node_depth
 
 
 ## Keeps the authored layout centred in whatever space the panel gets, so the
@@ -127,9 +156,14 @@ func _layout_board() -> void:
 
 
 func _refresh() -> void:
+	_revealed = _walk_from_start(true)
 	for node: GraphNodeView in _nodes.values():
+		node.visible = _revealed.has(node.node_id)
 		node.apply_state(_is_reachable(node))
 	for edge: GraphEdgeView in _edges.values():
+		## A lock is shown as soon as the circle it leads out of is revealed, so
+		## the player can see what guards the next area but not what is past it.
+		edge.visible = _revealed.has(edge.from_id)
 		var selectable := can_receive_resources(edge)
 		edge.set_selectable(selectable)
 		if not selectable and edge.prioritized:
@@ -138,15 +172,10 @@ func _refresh() -> void:
 		_hud.refresh(_run_state)
 
 
-## True while this lock still needs something and every lock leading into it
-## has already been opened.
+## True while this lock still needs something and the player has opened a path
+## to the circle it leads out of.
 func can_receive_resources(edge: GraphEdgeView) -> bool:
-	if not edge.locked or edge.is_fully_paid():
-		return false
-	for other: GraphEdgeView in _edges.values():
-		if other.to_id == edge.from_id and other.locked:
-			return false
-	return true
+	return edge.locked and not edge.is_fully_paid() and _revealed.has(edge.from_id)
 
 
 ## A lock only accepts resources once every lock leading into it has been
@@ -173,24 +202,27 @@ func allocate_winnings(kind: int, amount: int) -> Array[LockDelivery]:
 	for edge in candidates:
 		if leftover <= 0:
 			break
+		var lock_index := edge.active_lock_index()
 		var taken := edge.reserve(kind, leftover)
 		if taken <= 0:
 			continue
-		deliveries.append(LockDelivery.new(edge, kind, taken))
+		deliveries.append(LockDelivery.new(edge, lock_index, kind, taken))
 		leftover -= taken
 	return deliveries
 
 
-func credit_lock(edge: GraphEdgeView, kind: int, amount: int) -> void:
+func credit_lock(edge: GraphEdgeView, lock_index: int, amount: int) -> void:
 	if edge == null:
 		return
-	edge.apply_payment(kind, amount)
+	edge.apply_payment(lock_index, amount)
 	if edge.is_fully_paid() and edge.locked:
 		unlock_edge(edge.edge_id)
+	else:
+		_refresh()
 
 
 func _can_pay(node: GraphNodeView) -> bool:
-	if node.is_paid():
+	if node.remaining_capacity() <= 0:
 		return false
 	if _run_state == null or _run_state.coins < 1:
 		return false
@@ -198,12 +230,7 @@ func _can_pay(node: GraphNodeView) -> bool:
 
 
 func _is_reachable(node: GraphNodeView) -> bool:
-	if node.is_start:
-		return true
-	for edge: GraphEdgeView in _edges.values():
-		if edge.to_id == node.node_id and not edge.locked:
-			return true
-	return false
+	return _revealed.has(node.node_id)
 
 
 func _on_node_pressed(id: StringName) -> void:

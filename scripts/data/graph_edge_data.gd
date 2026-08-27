@@ -5,8 +5,9 @@ extends Resource
 @export var from_id: StringName
 @export var to_id: StringName
 @export var locked: bool = true
-@export var lock_symbol: int = 0
-@export var lock_amount: int = 10
-## Set to -1 for a lock with only one resource requirement.
-@export var lock_symbol_2: int = -1
-@export var lock_amount_2: int = 0
+## The locks sitting on this edge, ordered from the source circle outwards.
+## Each one must be paid off before the next starts taking resources, and the
+## circle on the far side only opens once all of them are done. The two arrays
+## run in parallel: one symbol and one amount per lock.
+@export var lock_symbols: PackedInt32Array = PackedInt32Array([0])
+@export var lock_amounts: PackedInt32Array = PackedInt32Array([10])

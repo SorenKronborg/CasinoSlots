@@ -16,6 +16,7 @@ var is_start: bool = false
 var coin_cost: int = 10
 var paid: int = 0
 var board_position: Vector2 = Vector2.ZERO
+var _in_flight: int = 0
 
 
 func setup(data: GraphNodeData) -> void:
@@ -40,13 +41,33 @@ func center() -> Vector2:
 	return position + size * 0.5
 
 
+func center_global() -> Vector2:
+	return get_global_rect().get_center()
+
+
 func is_paid() -> bool:
 	return paid >= coin_cost
+
+
+func remaining_capacity() -> int:
+	return maxi(coin_cost - paid - _in_flight, 0)
+
+
+func reserve_coin() -> bool:
+	if remaining_capacity() <= 0:
+		return false
+	_in_flight += 1
+	return true
+
+
+func cancel_reserve() -> void:
+	_in_flight = maxi(_in_flight - 1, 0)
 
 
 func add_coin() -> void:
 	if is_paid():
 		return
+	_in_flight = maxi(_in_flight - 1, 0)
 	paid += 1
 	_refresh_label()
 	if is_paid():

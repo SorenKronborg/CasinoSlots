@@ -5,9 +5,18 @@ const TOKEN_SIZE := Vector2(26, 26)
 const ICON_SIZE := Vector2(20, 20)
 const FLIGHT_TIME := 0.55
 const STAGGER := 0.05
+const COIN_TEXTURE := preload("res://assets/icons/coin.png")
 
 
 func fly(kind: int, count: int, from_global: Vector2, to_global: Vector2, arrived: Callable) -> void:
+	_fly_texture(Symbols.texture(kind), count, from_global, to_global, arrived)
+
+
+func fly_coin(count: int, from_global: Vector2, to_global: Vector2, arrived: Callable) -> void:
+	_fly_texture(COIN_TEXTURE, count, from_global, to_global, arrived)
+
+
+func _fly_texture(texture: Texture2D, count: int, from_global: Vector2, to_global: Vector2, arrived: Callable) -> void:
 	for i in count:
 		var token := PanelContainer.new()
 		token.custom_minimum_size = TOKEN_SIZE
@@ -23,7 +32,7 @@ func fly(kind: int, count: int, from_global: Vector2, to_global: Vector2, arrive
 		style.set_content_margin_all(3)
 		token.add_theme_stylebox_override("panel", style)
 		var icon := TextureRect.new()
-		icon.texture = Symbols.texture(kind)
+		icon.texture = texture
 		icon.custom_minimum_size = ICON_SIZE
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
