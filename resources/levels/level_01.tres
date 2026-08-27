@@ -15,7 +15,7 @@ coin_cost = 10
 [sub_resource type="Resource" id="NodeNorth"]
 script = ExtResource("2_node")
 id = &"north"
-position = Vector2(494, 146)
+position = Vector2(480, 165)
 label = "N"
 is_start = false
 coin_cost = 20
@@ -23,7 +23,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeEast"]
 script = ExtResource("2_node")
 id = &"east"
-position = Vector2(706, 356)
+position = Vector2(700, 340)
 label = "E"
 is_start = false
 coin_cost = 20
@@ -31,7 +31,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeSouth"]
 script = ExtResource("2_node")
 id = &"south"
-position = Vector2(468, 538)
+position = Vector2(480, 530)
 label = "S"
 is_start = false
 coin_cost = 20
@@ -39,7 +39,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeWest"]
 script = ExtResource("2_node")
 id = &"west"
-position = Vector2(252, 326)
+position = Vector2(245, 340)
 label = "W"
 is_start = false
 coin_cost = 20
@@ -47,7 +47,7 @@ coin_cost = 20
 [sub_resource type="Resource" id="NodeNorthWest"]
 script = ExtResource("2_node")
 id = &"north_west"
-position = Vector2(342, 62)
+position = Vector2(185, 60)
 label = "NW"
 is_start = false
 coin_cost = 40
@@ -55,7 +55,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeNorthEast"]
 script = ExtResource("2_node")
 id = &"north_east"
-position = Vector2(618, 34)
+position = Vector2(565, 40)
 label = "NE"
 is_start = false
 coin_cost = 40
@@ -63,7 +63,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeEastNorth"]
 script = ExtResource("2_node")
 id = &"east_north"
-position = Vector2(866, 210)
+position = Vector2(840, 165)
 label = "EN"
 is_start = false
 coin_cost = 40
@@ -71,7 +71,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeEastSouth"]
 script = ExtResource("2_node")
 id = &"east_south"
-position = Vector2(834, 474)
+position = Vector2(895, 450)
 label = "ES"
 is_start = false
 coin_cost = 40
@@ -79,7 +79,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeSouthEast"]
 script = ExtResource("2_node")
 id = &"south_east"
-position = Vector2(616, 648)
+position = Vector2(680, 620)
 label = "SE"
 is_start = false
 coin_cost = 40
@@ -87,7 +87,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeSouthWest"]
 script = ExtResource("2_node")
 id = &"south_west"
-position = Vector2(344, 622)
+position = Vector2(355, 670)
 label = "SW"
 is_start = false
 coin_cost = 40
@@ -95,7 +95,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeWestSouth"]
 script = ExtResource("2_node")
 id = &"west_south"
-position = Vector2(96, 438)
+position = Vector2(55, 450)
 label = "WS"
 is_start = false
 coin_cost = 40
@@ -103,7 +103,7 @@ coin_cost = 40
 [sub_resource type="Resource" id="NodeWestNorth"]
 script = ExtResource("2_node")
 id = &"west_north"
-position = Vector2(124, 240)
+position = Vector2(150, 200)
 label = "WN"
 is_start = false
 coin_cost = 40

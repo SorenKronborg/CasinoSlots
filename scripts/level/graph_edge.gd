@@ -5,10 +5,14 @@ signal lock_clicked(id: StringName)
 
 const _COLOR_BLOCKED := Color(0.12, 0.12, 0.12, 1)
 const _COLOR_OPEN := Color(0.35, 0.7, 0.3, 1)
-## How far an edge bows away from a straight line, as a share of its length.
-const BOW_MIN := 0.04
-const BOW_MAX := 0.13
-const CURVE_STEPS := 24
+## Edges run straight along one axis and turn corners with a quarter circle.
+const CORNER_RADIUS := 54.0
+const ARC_STEPS := 10
+const LINE_STEPS := 40
+## Below this the two circles count as lined up, and the edge stays straight.
+const AXIS_EPSILON := 2.0
+## Clear space between two locks sitting on the same edge.
+const LOCK_GAP := 16.0
 
 var edge_id: StringName
 var from_id: StringName
@@ -31,7 +35,10 @@ var _lock_panels: Array[PanelContainer] = []
 var _lock_labels: Array[Label] = []
 var _from_center: Vector2 = Vector2.ZERO
 var _to_center: Vector2 = Vector2.ZERO
-var _control_point: Vector2 = Vector2.ZERO
+var _path: PackedVector2Array = PackedVector2Array()
+var _path_length: float = 0.0
+## Where each lock sits along the path, as a share of its total length.
+var _lock_offsets: PackedFloat32Array = PackedFloat32Array()
 var _style_idle: StyleBoxFlat
 var _style_priority: StyleBoxFlat
 var _style_opened: StyleBoxFlat
@@ -108,39 +115,101 @@ func _build_locks() -> void:
 	_refresh_locks()
 
 
-## Spreads the locks evenly along the edge so a chain of them reads outward from
-## the circle the player already owns.
 func set_endpoints(from_center: Vector2, to_center: Vector2) -> void:
 	if _line == null:
 		return
 	_from_center = from_center
 	_to_center = to_center
-	_control_point = _pick_control_point()
-	var spacing := float(_lock_panels.size() + 1)
-	for index in _lock_panels.size():
-		var panel := _lock_panels[index]
-		panel.reset_size()
-		var along := float(index + 1) / spacing
-		panel.position = _point_at(along) - panel.size * 0.5
+	_rebuild_path()
+	_place_locks()
 	_update_line()
 
 
-## Bends the edge to one side so the board reads hand-drawn instead of like a
-## wiring diagram. The bow is derived from the edge id, so it is random-looking
-## but identical every time the level loads.
-func _pick_control_point() -> Vector2:
-	var span := _to_center - _from_center
-	if span.is_zero_approx():
-		return _from_center
-	var noise := int(abs(hash(edge_id)))
-	var bow := BOW_MIN + float(noise % 1000) / 1000.0 * (BOW_MAX - BOW_MIN)
-	if noise % 2 == 1:
-		bow = -bow
-	return _from_center.lerp(_to_center, 0.5) + span.orthogonal().normalized() * span.length() * bow
+## Lays the locks out end to end around the middle of the edge, measuring the
+## room each one actually needs so a chain of them never overlaps.
+func _place_locks() -> void:
+	_lock_offsets = PackedFloat32Array()
+	_lock_offsets.resize(_lock_panels.size())
+	if _lock_panels.is_empty() or _path_length <= 0.0:
+		return
+	var runs_sideways := absf(_to_center.x - _from_center.x) >= absf(_to_center.y - _from_center.y)
+	var extents := PackedFloat32Array()
+	var needed := LOCK_GAP * float(_lock_panels.size() - 1)
+	for panel in _lock_panels:
+		panel.reset_size()
+		var extent: float = panel.size.x if runs_sideways else panel.size.y
+		extents.append(extent)
+		needed += extent
+	var cursor := maxf((_path_length - needed) * 0.5, 0.0)
+	for index in _lock_panels.size():
+		cursor += extents[index] * 0.5
+		var along := clampf(cursor / _path_length, 0.0, 1.0)
+		_lock_offsets[index] = along
+		_lock_panels[index].position = _point_at(along) - _lock_panels[index].size * 0.5
+		cursor += extents[index] * 0.5 + LOCK_GAP
 
 
+## Circles that share a row or column are joined by a straight run. Everything
+## else takes the long leg first, then rounds off into the short one with a
+## quarter circle, so the board reads like drawn track rather than diagonals.
+func _rebuild_path() -> void:
+	_path = PackedVector2Array([_from_center])
+	var delta := _to_center - _from_center
+	if absf(delta.x) < AXIS_EPSILON or absf(delta.y) < AXIS_EPSILON:
+		_path.append(_to_center)
+		_measure_path()
+		return
+	var radius := minf(CORNER_RADIUS, minf(absf(delta.x), absf(delta.y)))
+	var step := Vector2(signf(delta.x), signf(delta.y)) * radius
+	var corner: Vector2
+	var arc_start: Vector2
+	var arc_end: Vector2
+	if absf(delta.x) >= absf(delta.y):
+		corner = Vector2(_to_center.x, _from_center.y)
+		arc_start = corner - Vector2(step.x, 0.0)
+		arc_end = corner + Vector2(0.0, step.y)
+	else:
+		corner = Vector2(_from_center.x, _to_center.y)
+		arc_start = corner - Vector2(0.0, step.y)
+		arc_end = corner + Vector2(step.x, 0.0)
+	var center := arc_start + arc_end - corner
+	_path.append(arc_start)
+	_append_arc(center, arc_start, arc_end)
+	_path.append(_to_center)
+	_measure_path()
+
+
+func _append_arc(center: Vector2, from_point: Vector2, to_point: Vector2) -> void:
+	var start_angle := (from_point - center).angle()
+	var sweep := wrapf((to_point - center).angle() - start_angle, -PI, PI)
+	var radius := (from_point - center).length()
+	for step in range(1, ARC_STEPS):
+		var angle := start_angle + sweep * float(step) / float(ARC_STEPS)
+		_path.append(center + Vector2.RIGHT.rotated(angle) * radius)
+	_path.append(to_point)
+
+
+func _measure_path() -> void:
+	_path_length = 0.0
+	for index in range(1, _path.size()):
+		_path_length += _path[index].distance_to(_path[index - 1])
+
+
+## Walks the path by distance so locks sit evenly spaced no matter how much of
+## the edge is straight and how much is corner.
 func _point_at(along: float) -> Vector2:
-	return _from_center.bezier_interpolate(_control_point, _control_point, _to_center, along)
+	if _path.size() < 2:
+		return _from_center
+	var target := _path_length * clampf(along, 0.0, 1.0)
+	var travelled := 0.0
+	for index in range(1, _path.size()):
+		var span := _path[index] - _path[index - 1]
+		var length := span.length()
+		if travelled + length >= target:
+			var into := 0.0 if length <= 0.0 else (target - travelled) / length
+			return _path[index - 1] + span * into
+		travelled += length
+	return _path[_path.size() - 1]
 
 
 func set_locked(value: bool) -> void:
@@ -241,12 +310,12 @@ func _update_line() -> void:
 	var limit := 1.0
 	var blocker := Rect2()
 	var index := active_lock_index()
-	if not is_passable() and index >= 0 and index < _lock_panels.size():
-		limit = float(index + 1) / float(_lock_panels.size() + 1)
+	if not is_passable() and index >= 0 and index < _lock_offsets.size():
+		limit = _lock_offsets[index]
 		blocker = Rect2(_lock_panels[index].position, _lock_panels[index].size)
 	var points := PackedVector2Array()
-	for step in CURVE_STEPS + 1:
-		var along := float(step) / float(CURVE_STEPS)
+	for step in LINE_STEPS + 1:
+		var along := float(step) / float(LINE_STEPS)
 		if along > limit:
 			break
 		var point := _point_at(along)

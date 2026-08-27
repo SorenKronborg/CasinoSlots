@@ -11,6 +11,7 @@ const BASE_SPIN_TIME := 0.7
 
 @onready var _reel_row: HBoxContainer = %ReelRow
 @onready var _spin_button: Button = %SpinButton
+@onready var _payout_tray: PanelContainer = %PayoutTray
 
 var _reels: Array[Reel] = []
 var _pending: int = 0
@@ -32,6 +33,12 @@ func is_spinning() -> bool:
 
 func payout_origin() -> Vector2:
 	return _reel_row.get_global_rect().get_center()
+
+
+## Coins drop out of the bottom of the tray rather than the middle of it.
+func coin_origin() -> Vector2:
+	var tray := _payout_tray.get_global_rect()
+	return Vector2(tray.get_center().x, tray.end.y)
 
 
 func set_allow_spin(value: bool) -> void:

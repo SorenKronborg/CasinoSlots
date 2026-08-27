@@ -39,7 +39,10 @@ func _on_coin_paid(node: GraphNodeView) -> void:
 
 func _on_spin_resolved(symbols: Array[int]) -> void:
 	var payout := SlotPayout.from_spin(symbols)
-	_state.apply_payout(payout)
+	if payout.coins > 0:
+		_flight.fly_coin(payout.coins, _slots.coin_origin(), _level.coin_origin(), func() -> void:
+			_state.add_coins(1)
+		)
 	var origin := _slots.payout_origin()
 	for kind in Symbols.COUNT:
 		var amount: int = payout.symbols[kind]

@@ -12,8 +12,8 @@ func _init() -> void:
 	symbols.resize(Symbols.COUNT)
 
 
-func apply_payout(payout: SlotPayout) -> void:
-	coins += payout.coins
+func add_coins(amount: int) -> void:
+	coins += amount
 	changed.emit()
 
 

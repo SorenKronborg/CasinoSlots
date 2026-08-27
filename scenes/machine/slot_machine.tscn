@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/machine/slot_machine.gd" id="1_machine"]
 
@@ -17,6 +17,22 @@ content_margin_left = 10.0
 content_margin_top = 12.0
 content_margin_right = 10.0
 content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="Tray"]
+bg_color = Color(0.09, 0.04, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.68, 0.2, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
 
 [node name="SlotMachine" type="PanelContainer"]
 anchors_preset = 15
@@ -53,3 +69,10 @@ custom_minimum_size = Vector2(88, 36)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "SPIN"
+
+[node name="PayoutTray" type="PanelContainer" parent="Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(132, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Tray")
