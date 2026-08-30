@@ -1,26 +1,14 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://chciinc0ouvqi"]
 
-[ext_resource type="Script" path="res://features/menu/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" uid="uid://hbepm1gdeov2" path="res://features/menu/main_menu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://features/game_idle/idle_game_scene.tscn" id="2_idle"]
 [ext_resource type="PackedScene" path="res://features/options/options.tscn" id="3_options"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.85, 0.1, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
 content_margin_left = 24.0
 content_margin_top = 14.0
 content_margin_right = 24.0
 content_margin_bottom = 14.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
 bg_color = Color(0.08, 0.08, 0.08, 1)
 border_width_left = 3
 border_width_top = 3
@@ -31,12 +19,28 @@ corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 content_margin_left = 24.0
 content_margin_top = 14.0
 content_margin_right = 24.0
 content_margin_bottom = 14.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+content_margin_left = 24.0
+content_margin_top = 16.0
+content_margin_right = 24.0
+content_margin_bottom = 12.0
 bg_color = Color(0, 0, 0, 1)
 border_width_left = 3
 border_width_top = 3
@@ -47,10 +51,6 @@ corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
-content_margin_left = 24.0
-content_margin_top = 16.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
 
 [sub_resource type="Theme" id="Theme_buttons"]
 Button/colors/font_color = Color(1, 1, 1, 1)
@@ -63,7 +63,7 @@ Button/styles/hover = SubResource("StyleBoxFlat_hover")
 Button/styles/normal = SubResource("StyleBoxFlat_normal")
 Button/styles/pressed = SubResource("StyleBoxFlat_pressed")
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=830921891]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -74,7 +74,7 @@ script = ExtResource("1_menu")
 idle_game_scene = ExtResource("2_idle")
 options_scene = ExtResource("3_options")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=249299132]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -84,7 +84,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.03, 0.1, 0.04, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Center" type="CenterContainer" parent="." unique_id=1824527862]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -92,43 +92,41 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Buttons" type="VBoxContainer" parent="Center"]
+[node name="Buttons" type="VBoxContainer" parent="Center" unique_id=2052346429]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 theme = SubResource("Theme_buttons")
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="NewGame" type="Button" parent="Center/Buttons"]
+[node name="NewGame" type="Button" parent="Center/Buttons" unique_id=750812504]
 unique_name_in_owner = true
+auto_translate_mode = 2
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-auto_translate_mode = 2
 text = "New Game"
 
-[connection signal="pressed" from="Center/Buttons/NewGame" to="." method="_on_new_game_pressed"]
-
-[node name="LoadGame" type="Button" parent="Center/Buttons"]
+[node name="LoadGame" type="Button" parent="Center/Buttons" unique_id=1809411293]
 unique_name_in_owner = true
+auto_translate_mode = 2
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-auto_translate_mode = 2
 text = "Load Game"
 
-[node name="Options" type="Button" parent="Center/Buttons"]
+[node name="Options" type="Button" parent="Center/Buttons" unique_id=1262435495]
 unique_name_in_owner = true
+auto_translate_mode = 2
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-auto_translate_mode = 2
 text = "Options"
 
-[connection signal="pressed" from="Center/Buttons/Options" to="." method="_on_options_pressed"]
-
-[node name="Quit" type="Button" parent="Center/Buttons"]
+[node name="Quit" type="Button" parent="Center/Buttons" unique_id=1613819200]
 unique_name_in_owner = true
+auto_translate_mode = 2
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-auto_translate_mode = 2
 text = "Quit"
 
+[connection signal="pressed" from="Center/Buttons/NewGame" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="Center/Buttons/Options" to="." method="_on_options_pressed"]
 [connection signal="pressed" from="Center/Buttons/Quit" to="." method="_on_quit_pressed"]
