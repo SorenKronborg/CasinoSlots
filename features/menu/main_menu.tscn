@@ -130,3 +130,5 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 auto_translate_mode = 2
 text = "Quit"
+
+[connection signal="pressed" from="Center/Buttons/Quit" to="." method="_on_quit_pressed"]

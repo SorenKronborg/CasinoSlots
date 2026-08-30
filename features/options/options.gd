@@ -1,5 +1,7 @@
 extends Control
 
+@export_file("*.tscn") var main_menu_scene_path: String
+
 
 func _ready() -> void:
 	_apply_texts()
@@ -25,9 +27,7 @@ func _on_german_pressed() -> void:
 
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file(
-		str(ProjectSettings.get_setting("application/config/run/main_scene"))
-	)
+	get_tree().change_scene_to_file(main_menu_scene_path)
 
 
 func _set_locale(locale: String) -> void:
