@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://menu/main_menu.gd" id="1_menu"]
-[ext_resource type="PackedScene" path="res://game_idle/idle_game_scene.tscn" id="2_idle"]
+[ext_resource type="Script" path="res://features/menu/main_menu.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://features/game_idle/idle_game_scene.tscn" id="2_idle"]
+[ext_resource type="PackedScene" path="res://features/options/options.tscn" id="3_options"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -71,6 +72,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 idle_game_scene = ExtResource("2_idle")
+options_scene = ExtResource("3_options")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -119,6 +121,8 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 auto_translate_mode = 2
 text = "Options"
+
+[connection signal="pressed" from="Center/Buttons/Options" to="." method="_on_options_pressed"]
 
 [node name="Quit" type="Button" parent="Center/Buttons"]
 unique_name_in_owner = true

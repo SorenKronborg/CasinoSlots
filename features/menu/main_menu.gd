@@ -1,6 +1,7 @@
 extends Control
 
 @export var idle_game_scene: PackedScene
+@export var options_scene: PackedScene
 
 
 func _ready() -> void:
@@ -12,3 +13,7 @@ func _ready() -> void:
 
 func _on_new_game_pressed() -> void:
 	get_tree().change_scene_to_packed(idle_game_scene)
+
+
+func _on_options_pressed() -> void:
+	get_tree().change_scene_to_packed(options_scene)
