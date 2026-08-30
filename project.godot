@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="CasinoSlots"
-run/main_scene="res://scenes/game/game.tscn"
+run/main_scene="res://menu/main_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -22,6 +22,11 @@ window/size/viewport_height=810
 window/size/mode=2
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://localization/buttons.en.translation", "res://localization/buttons.fr.translation", "res://localization/buttons.de.translation")
+locale/fallback="en"
 
 [physics]
 
