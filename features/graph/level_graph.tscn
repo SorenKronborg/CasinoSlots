@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://3be6jaqdvddt"]
 
-[ext_resource type="Script" path="res://features/graph/level_graph.gd" id="1_graph"]
+[ext_resource type="Script" uid="uid://dl20bcfvcwr46" path="res://features/graph/level_graph.gd" id="1_graph"]
 [ext_resource type="PackedScene" path="res://features/graph/level_graph_node.tscn" id="2_node"]
 [ext_resource type="PackedScene" path="res://features/graph/level_graph_edge.tscn" id="3_edge"]
 
-[node name="LevelGraph" type="Control"]
+[node name="LevelGraph" type="Control" unique_id=496410428]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,10 +15,10 @@ script = ExtResource("1_graph")
 default_node_scene = ExtResource("2_node")
 edge_scene = ExtResource("3_edge")
 
-[node name="Edges" type="Node2D" parent="."]
+[node name="Edges" type="Node2D" parent="." unique_id=1882152841]
 unique_name_in_owner = true
 
-[node name="Nodes" type="Control" parent="."]
+[node name="Nodes" type="Control" parent="." unique_id=1333874272]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

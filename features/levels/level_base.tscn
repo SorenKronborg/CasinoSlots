@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://features/levels/level_base.gd" id="1_base"]
 [ext_resource type="PackedScene" path="res://features/graph/level_graph.tscn" id="2_graph"]
+[ext_resource type="PackedScene" path="res://features/slot_machine/slot_machine.tscn" id="3_slot"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -54,6 +55,22 @@ border_width_right = 3
 border_width_bottom = 3
 border_color = Color(1, 0.85, 0.1, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info"]
+bg_color = Color(0, 0, 0, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
 [node name="LevelBase" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -103,6 +120,76 @@ size_flags_vertical = 3
 size_flags_stretch_ratio = 15.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bottom")
+
+[node name="SlotMachineCenter" type="CenterContainer" parent="Layout/BottomField"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SlotMachine" parent="Layout/BottomField/SlotMachineCenter" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LevelHud" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220
+offset_top = 16
+offset_right = -16
+offset_bottom = 108
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info")
+
+[node name="Rows" type="VBoxContainer" parent="LevelHud"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PrestigeRow" type="HBoxContainer" parent="LevelHud/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PrestigeLabel" type="Label" parent="LevelHud/Rows/PrestigeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Prestige"
+
+[node name="PrestigeValue" type="Label" parent="LevelHud/Rows/PrestigeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "0"
+horizontal_alignment = 2
+
+[node name="SpinsRow" type="HBoxContainer" parent="LevelHud/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SpinsLabel" type="Label" parent="LevelHud/Rows/SpinsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Spins"
+
+[node name="SpinsValue" type="Label" parent="LevelHud/Rows/SpinsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "50"
+horizontal_alignment = 2
 
 [node name="Back" type="Button" parent="."]
 unique_name_in_owner = true
