@@ -44,6 +44,7 @@ func _add_node(spec: LevelNodeSpec) -> void:
 
 func _add_edge(spec: LevelEdgeSpec) -> void:
 	if not _nodes_by_id.has(spec.from_id) or not _nodes_by_id.has(spec.to_id):
+		push_warning("Edge '%s' -> '%s' skipped: unknown node id" % [spec.from_id, spec.to_id])
 		return
 	var edge := edge_scene.instantiate() as LevelGraphEdge
 	%Edges.add_child(edge)

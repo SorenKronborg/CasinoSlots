@@ -31,7 +31,7 @@ locked = true
 [sub_resource type="Resource" id="Resource_1t4s0"]
 script = ExtResource("1_2l210")
 from_id = "west"
-to_id = "w-west"
+to_id = "wwest"
 metadata/_custom_type_script = "uid://b732m1ihcm8s"
 
 [sub_resource type="Resource" id="Node_center"]
@@ -65,8 +65,9 @@ normalized_position = Vector2(0.22, 0.5)
 
 [sub_resource type="Resource" id="Resource_601s7"]
 script = ExtResource("2_trv2a")
-id = "w-west"
+id = "wwest"
 label = "far west"
+normalized_position = Vector2(0.06, 0.5)
 metadata/_custom_type_script = "uid://carolib3wopva"
 
 [resource]
