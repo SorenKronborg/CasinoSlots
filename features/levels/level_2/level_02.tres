@@ -1,0 +1,75 @@
+[gd_resource type="Resource" script_class="LevelDefinition" format=3 uid="uid://b45a7maqkt35s"]
+
+[ext_resource type="Script" uid="uid://b732m1ihcm8s" path="res://features/levels/level_edge_spec.gd" id="1_2l210"]
+[ext_resource type="Script" uid="uid://carolib3wopva" path="res://features/levels/level_node_spec.gd" id="2_trv2a"]
+[ext_resource type="Script" uid="uid://dnsm4n72pgr7d" path="res://features/levels/level_definition.gd" id="3_igv2l"]
+
+[sub_resource type="Resource" id="Edge_n"]
+script = ExtResource("1_2l210")
+from_id = "center"
+to_id = "north"
+locked = true
+
+[sub_resource type="Resource" id="Edge_e"]
+script = ExtResource("1_2l210")
+from_id = "center"
+to_id = "east"
+locked = true
+
+[sub_resource type="Resource" id="Edge_s"]
+script = ExtResource("1_2l210")
+from_id = "center"
+to_id = "south"
+locked = true
+
+[sub_resource type="Resource" id="Edge_w"]
+script = ExtResource("1_2l210")
+from_id = "center"
+to_id = "west"
+locked = true
+
+[sub_resource type="Resource" id="Resource_1t4s0"]
+script = ExtResource("1_2l210")
+from_id = "west"
+to_id = "w-west"
+metadata/_custom_type_script = "uid://b732m1ihcm8s"
+
+[sub_resource type="Resource" id="Node_center"]
+script = ExtResource("2_trv2a")
+id = "center"
+label = "1"
+
+[sub_resource type="Resource" id="Node_north"]
+script = ExtResource("2_trv2a")
+id = "north"
+label = "N"
+normalized_position = Vector2(0.5, 0.22)
+
+[sub_resource type="Resource" id="Node_east"]
+script = ExtResource("2_trv2a")
+id = "east"
+label = "E"
+normalized_position = Vector2(0.78, 0.5)
+
+[sub_resource type="Resource" id="Node_south"]
+script = ExtResource("2_trv2a")
+id = "south"
+label = "S"
+normalized_position = Vector2(0.5, 0.78)
+
+[sub_resource type="Resource" id="Node_west"]
+script = ExtResource("2_trv2a")
+id = "west"
+label = "W"
+normalized_position = Vector2(0.22, 0.5)
+
+[sub_resource type="Resource" id="Resource_601s7"]
+script = ExtResource("2_trv2a")
+id = "w-west"
+label = "far west"
+metadata/_custom_type_script = "uid://carolib3wopva"
+
+[resource]
+script = ExtResource("3_igv2l")
+nodes = Array[ExtResource("2_trv2a")]([SubResource("Node_center"), SubResource("Node_north"), SubResource("Node_east"), SubResource("Node_south"), SubResource("Node_west"), SubResource("Resource_601s7")])
+edges = Array[ExtResource("1_2l210")]([SubResource("Edge_n"), SubResource("Edge_e"), SubResource("Edge_s"), SubResource("Edge_w"), SubResource("Resource_1t4s0")])

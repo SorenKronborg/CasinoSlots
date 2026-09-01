@@ -1,7 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://features/game_idle/idle_game_scene.gd" id="1_idle"]
 [ext_resource type="PackedScene" path="res://features/upgrades/upgrades.tscn" id="2_upgrades"]
+[ext_resource type="Texture2D" path="res://assets/icons/crown.svg" id="3_crown"]
+[ext_resource type="PackedScene" path="res://features/levels/level_base.tscn" id="4_level"]
+[ext_resource type="Resource" path="res://features/levels/level_1/level_01.tres" id="5_level1"]
+[ext_resource type="Resource" path="res://features/levels/level_2/level_02.tres" id="6_level2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -62,6 +66,22 @@ Button/styles/hover = SubResource("StyleBoxFlat_hover")
 Button/styles/normal = SubResource("StyleBoxFlat_normal")
 Button/styles/pressed = SubResource("StyleBoxFlat_pressed")
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info"]
+bg_color = Color(0, 0, 0, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
 [node name="IdleGameScene" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -71,6 +91,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_idle")
 upgrades_scene = ExtResource("2_upgrades")
+level_scene = ExtResource("4_level")
+mission_1_definition = ExtResource("5_level1")
+mission_2_definition = ExtResource("6_level2")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -81,6 +104,51 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.03, 0.1, 0.04, 1)
+
+[node name="ResourceInfo" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -196
+offset_top = 16
+offset_right = -16
+offset_bottom = 60
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info")
+
+[node name="Rows" type="VBoxContainer" parent="ResourceInfo"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PrestigeRow" type="HBoxContainer" parent="ResourceInfo/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="ResourceInfo/Rows/PrestigeRow"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_crown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PrestigeLabel" type="Label" parent="ResourceInfo/Rows/PrestigeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Prestige"
+
+[node name="PrestigeValue" type="Label" parent="ResourceInfo/Rows/PrestigeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "5"
+horizontal_alignment = 2
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -98,8 +166,6 @@ layout_mode = 2
 theme = SubResource("Theme_buttons")
 auto_translate_mode = 2
 text = "Upgrades"
-
-[connection signal="pressed" from="Center/Upgrades" to="." method="_on_upgrades_pressed"]
 
 [node name="Missions" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -143,3 +209,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 auto_translate_mode = 2
 text = "Mission 4"
+
+[connection signal="pressed" from="Center/Upgrades" to="." method="_on_upgrades_pressed"]
+[connection signal="pressed" from="Missions/Mission1" to="." method="_on_mission_1_pressed"]
+[connection signal="pressed" from="Missions/Mission2" to="." method="_on_mission_2_pressed"]

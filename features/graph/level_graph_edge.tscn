@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://features/graph/level_graph_edge.gd" id="1_edge"]
+[ext_resource type="Texture2D" path="res://assets/icons/lock.svg" id="2_lock"]
+
+[node name="LevelGraphEdge" type="Node2D"]
+script = ExtResource("1_edge")
+
+[node name="Line" type="Line2D" parent="."]
+unique_name_in_owner = true
+width = 5.0
+default_color = Color(1, 0.85, 0.1, 1)
+antialiased = true
+
+[node name="Lock" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("2_lock")
