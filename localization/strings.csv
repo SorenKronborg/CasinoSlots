@@ -1,8 +1,10 @@
 keys,en,fr,de
 New Game,New Game,Nouvelle partie,Neues Spiel
-Load Game,Load Game,Charger une partie,Spiel laden
+Continue Game,Continue Game,Continuer,Spiel fortsetzen
+Save Game,Save Game,Sauvegarder,Spiel speichern
 Options,Options,Options,Optionen
 Quit,Quit,Quitter,Beenden
+Quit Game,Quit Game,Quitter la partie,Spiel beenden
 English,English,Anglais,Englisch
 French,French,Français,Französisch
 German,German,Allemand,Deutsch

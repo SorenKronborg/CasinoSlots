@@ -94,6 +94,7 @@ upgrades_scene = ExtResource("2_upgrades")
 level_scene = ExtResource("4_level")
 mission_1_definition = ExtResource("5_level1")
 mission_2_definition = ExtResource("6_level2")
+main_menu_scene_path = "res://features/menu/main_menu.tscn"
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -104,6 +105,29 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.03, 0.1, 0.04, 1)
+
+[node name="TopLeftButtons" type="VBoxContainer" parent="."]
+layout_mode = 1
+offset_left = 16
+offset_top = 16
+offset_right = 200
+offset_bottom = 140
+theme = SubResource("Theme_buttons")
+theme_override_constants/separation = 12
+
+[node name="SaveGame" type="Button" parent="TopLeftButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 56)
+layout_mode = 2
+auto_translate_mode = 2
+text = "Save Game"
+
+[node name="QuitGame" type="Button" parent="TopLeftButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 56)
+layout_mode = 2
+auto_translate_mode = 2
+text = "Quit Game"
 
 [node name="ResourceInfo" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -210,6 +234,8 @@ size_flags_vertical = 3
 auto_translate_mode = 2
 text = "Mission 4"
 
+[connection signal="pressed" from="TopLeftButtons/SaveGame" to="." method="_on_save_game_pressed"]
+[connection signal="pressed" from="TopLeftButtons/QuitGame" to="." method="_on_quit_game_pressed"]
 [connection signal="pressed" from="Center/Upgrades" to="." method="_on_upgrades_pressed"]
 [connection signal="pressed" from="Missions/Mission1" to="." method="_on_mission_1_pressed"]
 [connection signal="pressed" from="Missions/Mission2" to="." method="_on_mission_2_pressed"]

@@ -106,12 +106,12 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 text = "New Game"
 
-[node name="LoadGame" type="Button" parent="Center/Buttons" unique_id=1809411293]
+[node name="ContinueGame" type="Button" parent="Center/Buttons" unique_id=1809411293]
 unique_name_in_owner = true
 auto_translate_mode = 2
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-text = "Load Game"
+text = "Continue Game"
 
 [node name="Options" type="Button" parent="Center/Buttons" unique_id=1262435495]
 unique_name_in_owner = true
@@ -128,5 +128,6 @@ layout_mode = 2
 text = "Quit"
 
 [connection signal="pressed" from="Center/Buttons/NewGame" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="Center/Buttons/ContinueGame" to="." method="_on_continue_game_pressed"]
 [connection signal="pressed" from="Center/Buttons/Options" to="." method="_on_options_pressed"]
 [connection signal="pressed" from="Center/Buttons/Quit" to="." method="_on_quit_pressed"]

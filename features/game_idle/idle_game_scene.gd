@@ -4,13 +4,12 @@ extends Control
 @export var level_scene: PackedScene
 @export var mission_1_definition: LevelDefinition
 @export var mission_2_definition: LevelDefinition
-
-var resources: Dictionary = {
-	"prestige": 5,
-}
+@export_file("*.tscn") var main_menu_scene_path: String
 
 
 func _ready() -> void:
+	%SaveGame.text = tr("Save Game")
+	%QuitGame.text = tr("Quit Game")
 	%Upgrades.text = tr("Upgrades")
 	%Mission1.text = tr("Mission 1")
 	%Mission2.text = tr("Mission 2")
@@ -21,7 +20,17 @@ func _ready() -> void:
 
 func _refresh_resource_info() -> void:
 	%PrestigeLabel.text = tr("Prestige")
-	%PrestigeValue.text = str(resources["prestige"])
+	%PrestigeValue.text = str(GameState.resources["prestige"])
+
+
+func _on_save_game_pressed() -> void:
+	var err := GameState.save_game()
+	if err != OK:
+		push_error("Failed to save game: %s" % error_string(err))
+
+
+func _on_quit_game_pressed() -> void:
+	get_tree().change_scene_to_file(main_menu_scene_path)
 
 
 func _on_upgrades_pressed() -> void:
