@@ -2,9 +2,10 @@ class_name SlotMachine
 extends HBoxContainer
 
 signal spin_started
-signal spin_finished(results: Array[int])
+signal spin_finished(results: Array[StringName])
 
 @export var symbols: Array[Texture2D] = []
+@export var symbol_ids: Array[StringName] = [&"cherry", &"bell", &"seven", &"watermelon", &"diamond"]
 @export var spin_duration := 2.0
 @export var tick_interval := 0.08
 
@@ -22,6 +23,14 @@ func _ready() -> void:
 		reel.setup(symbols)
 		_reels.append(reel)
 	_refresh_spin_button()
+
+
+func symbol_icon_map() -> Dictionary:
+	var icons := {}
+	var count := mini(symbol_ids.size(), symbols.size())
+	for i in count:
+		icons[symbol_ids[i]] = symbols[i]
+	return icons
 
 
 func is_spinning() -> bool:
@@ -67,8 +76,12 @@ func _play_spin() -> void:
 		_reels[i].show_index(results[i])
 
 
-func _current_results() -> Array[int]:
-	var results: Array[int] = []
+func _current_results() -> Array[StringName]:
+	var results: Array[StringName] = []
 	for reel in _reels:
-		results.append(reel.current_index())
+		var index := reel.current_index()
+		if index < 0 or index >= symbol_ids.size():
+			results.append(&"")
+			continue
+		results.append(symbol_ids[index])
 	return results

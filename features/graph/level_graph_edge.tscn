@@ -12,7 +12,36 @@ width = 5.0
 default_color = Color(1, 0.85, 0.1, 1)
 antialiased = true
 
-[node name="Lock" type="Sprite2D" parent="."]
+[node name="LockCluster" type="Node2D" parent="."]
 unique_name_in_owner = true
+
+[node name="Lock" type="Sprite2D" parent="LockCluster"]
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("2_lock")
+
+[node name="Requirement" type="HBoxContainer" parent="LockCluster"]
+unique_name_in_owner = true
+offset_left = 22.0
+offset_top = -12.0
+offset_right = 90.0
+offset_bottom = 12.0
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="TextureRect" parent="LockCluster/Requirement"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="LockCluster/Requirement"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
+theme_override_constants/outline_size = 4
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 14
+text = "0/10"
+vertical_alignment = 1

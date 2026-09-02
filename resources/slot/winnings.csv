@@ -1,0 +1,16 @@
+id,symbol,count,coins,resource,resource_amount,notes
+cherry_1,cherry,1,1,cherry,1,One cherry
+cherry_2,cherry,2,10,cherry,3,Two cherries
+cherry_3,cherry,3,10,cherry,10,Three cherries
+bell_1,bell,1,1,bell,1,One bell
+bell_2,bell,2,10,bell,3,Two bells
+bell_3,bell,3,10,bell,10,Three bells
+seven_1,seven,1,1,seven,1,One seven
+seven_2,seven,2,10,seven,3,Two sevens
+seven_3,seven,3,10,seven,10,Three sevens
+watermelon_1,watermelon,1,1,watermelon,1,One watermelon
+watermelon_2,watermelon,2,10,watermelon,3,Two watermelons
+watermelon_3,watermelon,3,10,watermelon,10,Three watermelons
+diamond_1,diamond,1,1,diamond,1,One diamond
+diamond_2,diamond,2,10,diamond,3,Two diamonds
+diamond_3,diamond,3,10,diamond,10,Three diamonds

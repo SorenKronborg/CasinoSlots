@@ -72,6 +72,7 @@ theme_override_constants/separation = 32
 alignment = 1
 script = ExtResource("1_slot")
 symbols = Array[Texture2D]([ExtResource("3_cherry"), ExtResource("4_bell"), ExtResource("5_seven"), ExtResource("6_melon"), ExtResource("7_diamond")])
+symbol_ids = Array[StringName]([&"cherry", &"bell", &"seven", &"watermelon", &"diamond"])
 
 [node name="Reels" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
