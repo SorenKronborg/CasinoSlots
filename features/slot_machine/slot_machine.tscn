@@ -1,0 +1,103 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://features/slot_machine/slot_machine.gd" id="1_slot"]
+[ext_resource type="PackedScene" path="res://features/slot_machine/slot_reel.tscn" id="2_reel"]
+[ext_resource type="Texture2D" path="res://assets/icons/cherry.svg" id="3_cherry"]
+[ext_resource type="Texture2D" path="res://assets/icons/bell.svg" id="4_bell"]
+[ext_resource type="Texture2D" path="res://assets/icons/seven.svg" id="5_seven"]
+[ext_resource type="Texture2D" path="res://assets/icons/watermelon.svg" id="6_melon"]
+[ext_resource type="Texture2D" path="res://assets/icons/diamond.png" id="7_diamond"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.08, 0.08, 0.08, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.92, 0.25, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+content_margin_left = 20.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.7, 0.05, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="Theme" id="Theme_buttons"]
+Button/colors/font_color = Color(1, 1, 1, 1)
+Button/colors/font_focus_color = Color(1, 1, 1, 1)
+Button/colors/font_hover_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(0.95, 0.9, 0.6, 1)
+Button/font_sizes/font_size = 20
+Button/styles/focus = SubResource("StyleBoxFlat_hover")
+Button/styles/hover = SubResource("StyleBoxFlat_hover")
+Button/styles/normal = SubResource("StyleBoxFlat_normal")
+Button/styles/pressed = SubResource("StyleBoxFlat_pressed")
+
+[node name="SlotMachine" type="HBoxContainer"]
+theme_override_constants/separation = 32
+alignment = 1
+script = ExtResource("1_slot")
+symbols = Array[Texture2D]([ExtResource("3_cherry"), ExtResource("4_bell"), ExtResource("5_seven"), ExtResource("6_melon"), ExtResource("7_diamond")])
+
+[node name="Reels" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Reel1" parent="Reels" instance=ExtResource("2_reel")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Reel2" parent="Reels" instance=ExtResource("2_reel")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Reel3" parent="Reels" instance=ExtResource("2_reel")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Spin" type="Button" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 2
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme = SubResource("Theme_buttons")
+text = "Spin"
+
+[connection signal="pressed" from="Spin" to="." method="_on_spin_pressed"]

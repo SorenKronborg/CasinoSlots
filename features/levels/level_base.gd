@@ -7,6 +7,7 @@ const STARTING_SPINS := 50
 @export_file("*.tscn") var idle_game_scene_path: String
 
 var level_prestige := 0
+var level_coins := 0
 var spins_remaining := STARTING_SPINS
 
 
@@ -36,5 +37,7 @@ func _on_spin_finished(_results: Array[int]) -> void:
 func _refresh_hud() -> void:
 	%PrestigeLabel.text = tr("Prestige")
 	%PrestigeValue.text = str(level_prestige)
+	%CoinsLabel.text = tr("Coins")
+	%CoinsValue.text = str(level_coins)
 	%SpinsLabel.text = tr("Spins")
 	%SpinsValue.text = str(spins_remaining)

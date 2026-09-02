@@ -142,7 +142,7 @@ anchor_right = 1.0
 offset_left = -220
 offset_top = 16
 offset_right = -16
-offset_bottom = 108
+offset_bottom = 142
 grow_horizontal = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_info")
@@ -164,6 +164,26 @@ theme_override_font_sizes/font_size = 18
 text = "Prestige"
 
 [node name="PrestigeValue" type="Label" parent="LevelHud/Rows/PrestigeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "0"
+horizontal_alignment = 2
+
+[node name="CoinsRow" type="HBoxContainer" parent="LevelHud/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoinsLabel" type="Label" parent="LevelHud/Rows/CoinsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Coins"
+
+[node name="CoinsValue" type="Label" parent="LevelHud/Rows/CoinsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
