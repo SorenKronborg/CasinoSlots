@@ -1,25 +1,25 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://uq5huvi88ha8"]
 
 [ext_resource type="Script" path="res://features/graph/level_graph_edge.gd" id="1_edge"]
-[ext_resource type="Texture2D" path="res://assets/icons/lock.svg" id="2_lock"]
+[ext_resource type="Texture2D" uid="uid://biwh8owbrkooh" path="res://assets/icons/lock.svg" id="2_lock"]
 
-[node name="LevelGraphEdge" type="Node2D"]
+[node name="LevelGraphEdge" type="Node2D" unique_id=2057838961]
 script = ExtResource("1_edge")
 
-[node name="Line" type="Line2D" parent="."]
+[node name="Line" type="Line2D" parent="." unique_id=1144146363]
 unique_name_in_owner = true
 width = 5.0
 default_color = Color(1, 0.85, 0.1, 1)
 antialiased = true
 
-[node name="LockCluster" type="Node2D" parent="."]
+[node name="LockCluster" type="Node2D" parent="." unique_id=2052755681]
 unique_name_in_owner = true
 
-[node name="Lock" type="Sprite2D" parent="LockCluster"]
+[node name="Lock" type="Sprite2D" parent="LockCluster" unique_id=1384554284]
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("2_lock")
 
-[node name="Requirement" type="HBoxContainer" parent="LockCluster"]
+[node name="Requirement" type="HBoxContainer" parent="LockCluster" unique_id=1097133602]
 unique_name_in_owner = true
 offset_left = 22.0
 offset_top = -12.0
@@ -28,7 +28,7 @@ offset_bottom = 12.0
 mouse_filter = 2
 theme_override_constants/separation = 4
 
-[node name="Icon" type="TextureRect" parent="LockCluster/Requirement"]
+[node name="Icon" type="TextureRect" parent="LockCluster/Requirement" unique_id=431035582]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
@@ -36,12 +36,12 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Amount" type="Label" parent="LockCluster/Requirement"]
+[node name="Amount" type="Label" parent="LockCluster/Requirement" unique_id=1412609803]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
-theme_override_constants/outline_size = 4
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 14
 text = "0/10"
 vertical_alignment = 1

@@ -3,115 +3,108 @@ extends Control
 
 signal node_clicked(node_id: String)
 
-@export var default_node_scene: PackedScene
-@export var edge_scene: PackedScene
-
-var _nodes_by_id: Dictionary = {}
-var _edges: Array[LevelGraphEdge] = []
+var _notes_by_id: Dictionary = {}
+var _links: Array[LevelGraphLink] = []
+var _note_order: Array[LevelNote] = []
 
 
-func load_definition(definition: LevelDefinition) -> void:
-	_clear()
-	if definition == null:
-		return
-	for spec in definition.nodes:
-		_add_node(spec)
-	for spec in definition.edges:
-		_add_edge(spec)
+func _ready() -> void:
+	_collect()
+	for note in _note_order:
+		note.pressed.connect(_on_node_pressed.bind(note.note_id()))
+	_refresh_links()
 	_refresh_node_access()
-	call_deferred("_layout_graph")
+	resized.connect(_refresh_links)
 
 
 func set_resource_icons(icons: Dictionary) -> void:
-	for edge in _edges:
-		var texture: Variant = icons.get(edge.unlock_resource)
-		edge.set_resource_icon(texture as Texture2D)
+	for link in _links:
+		link.set_resource_icons(icons)
 
 
 func deposit_into(node_id: String, available_coins: int) -> Vector2i:
-	if not _nodes_by_id.has(node_id):
+	if not _notes_by_id.has(node_id):
 		return Vector2i.ZERO
-	var node := _nodes_by_id[node_id] as LevelGraphNode
-	return node.deposit(available_coins)
+	var note := _notes_by_id[node_id] as LevelNote
+	return note.deposit(available_coins)
 
 
-func apply_resources(gained: Dictionary) -> void:
+func apply_resources(gained: Dictionary) -> int:
+	var leftover_total := 0
 	for resource in gained:
 		var remaining := int(gained[resource])
 		if remaining <= 0:
 			continue
-		for edge in _edges:
-			remaining = edge.contribute(resource, remaining)
-			if remaining <= 0:
-				break
+		for link in _links:
+			remaining = link.contribute(resource, remaining)
+		leftover_total += remaining
+	var prestige := 0
+	var reachable := _reachable_ids()
+	for note in _note_order:
+		if not bool(reachable.get(note.note_id(), false)):
+			continue
+		var fed: Vector2i = note.feed_leftover(leftover_total)
+		leftover_total -= fed.x
+		prestige += fed.y
+		if leftover_total <= 0:
+			break
 	_refresh_node_access()
+	return prestige
 
 
-func _ready() -> void:
-	resized.connect(_layout_graph)
-
-
-func _clear() -> void:
-	_nodes_by_id.clear()
-	_edges.clear()
-	for child in %Edges.get_children():
-		child.queue_free()
+func _collect() -> void:
+	_notes_by_id.clear()
+	_note_order.clear()
+	_links.clear()
 	for child in %Nodes.get_children():
-		child.queue_free()
+		var note := child as LevelNote
+		if note == null:
+			continue
+		_note_order.append(note)
+		_notes_by_id[note.note_id()] = note
+	for child in %Edges.get_children():
+		var link := child as LevelGraphLink
+		if link == null:
+			continue
+		_links.append(link)
 
 
-func _add_node(spec: LevelNodeSpec) -> void:
-	var scene := spec.node_scene if spec.node_scene != null else default_node_scene
-	var node := scene.instantiate() as LevelGraphNode
-	node.setup(spec)
-	node.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	node.pressed.connect(_on_node_pressed.bind(spec.id))
-	%Nodes.add_child(node)
-	_nodes_by_id[spec.id] = node
-
-
-func _add_edge(spec: LevelEdgeSpec) -> void:
-	if not _nodes_by_id.has(spec.from_id) or not _nodes_by_id.has(spec.to_id):
-		push_warning("Edge '%s' -> '%s' skipped: unknown node id" % [spec.from_id, spec.to_id])
-		return
-	var edge := edge_scene.instantiate() as LevelGraphEdge
-	%Edges.add_child(edge)
-	edge.setup(_nodes_by_id[spec.from_id], _nodes_by_id[spec.to_id], spec)
-	_edges.append(edge)
-
-
-func _refresh_node_access() -> void:
+func _reachable_ids() -> Dictionary:
 	var reachable: Dictionary = {}
 	var has_incoming: Dictionary = {}
-	for edge in _edges:
-		has_incoming[edge.to_id] = true
+	for link in _links:
+		if link.to_id() == "":
+			continue
+		has_incoming[link.to_id()] = true
 	var queue: Array[String] = []
-	for node_id in _nodes_by_id:
+	for note in _note_order:
+		var node_id := note.note_id()
 		if has_incoming.get(node_id, false):
 			continue
 		reachable[node_id] = true
 		queue.append(node_id)
 	while not queue.is_empty():
 		var node_id: String = queue.pop_front()
-		for edge in _edges:
-			if edge.locked or edge.from_id != node_id:
+		for link in _links:
+			if not link.is_fully_unlocked() or link.from_id() != node_id:
 				continue
-			if reachable.get(edge.to_id, false):
+			var to_id := link.to_id()
+			if to_id == "" or reachable.get(to_id, false):
 				continue
-			reachable[edge.to_id] = true
-			queue.append(edge.to_id)
-	for node_id in _nodes_by_id:
-		var node := _nodes_by_id[node_id] as LevelGraphNode
-		node.disabled = not bool(reachable.get(node_id, false))
-		node.focus_mode = Control.FOCUS_NONE if node.disabled else Control.FOCUS_ALL
+			reachable[to_id] = true
+			queue.append(to_id)
+	return reachable
 
 
-func _layout_graph() -> void:
-	for node in _nodes_by_id.values():
-		var graph_node := node as LevelGraphNode
-		graph_node.position = graph_node.normalized_position * size - graph_node.size * 0.5
-	for edge in %Edges.get_children():
-		(edge as LevelGraphEdge).refresh()
+func _refresh_node_access() -> void:
+	var reachable := _reachable_ids()
+	for note in _note_order:
+		note.set_reachable(bool(reachable.get(note.note_id(), false)))
+
+
+func _refresh_links() -> void:
+	for link in _links:
+		link.refresh()
 
 
 func _on_node_pressed(node_id: String) -> void:

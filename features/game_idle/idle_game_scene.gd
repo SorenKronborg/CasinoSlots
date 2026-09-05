@@ -1,9 +1,8 @@
 extends Control
 
 @export var upgrades_scene: PackedScene
-@export var level_scene: PackedScene
-@export var mission_1_definition: LevelDefinition
-@export var mission_2_definition: LevelDefinition
+@export var mission_1_scene: PackedScene
+@export var mission_2_scene: PackedScene
 @export_file("*.tscn") var main_menu_scene_path: String
 
 
@@ -38,17 +37,8 @@ func _on_upgrades_pressed() -> void:
 
 
 func _on_mission_1_pressed() -> void:
-	_open_level(mission_1_definition)
+	get_tree().change_scene_to_packed(mission_1_scene)
 
 
 func _on_mission_2_pressed() -> void:
-	_open_level(mission_2_definition)
-
-
-func _open_level(definition: LevelDefinition) -> void:
-	var level := level_scene.instantiate() as LevelBase
-	level.level_definition = definition
-	var tree := get_tree()
-	tree.root.add_child(level)
-	tree.current_scene.queue_free()
-	tree.current_scene = level
+	get_tree().change_scene_to_packed(mission_2_scene)

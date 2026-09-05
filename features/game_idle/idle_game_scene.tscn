@@ -1,11 +1,10 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://features/game_idle/idle_game_scene.gd" id="1_idle"]
 [ext_resource type="PackedScene" path="res://features/upgrades/upgrades.tscn" id="2_upgrades"]
 [ext_resource type="Texture2D" path="res://assets/icons/crown.svg" id="3_crown"]
-[ext_resource type="PackedScene" path="res://features/levels/level_base.tscn" id="4_level"]
-[ext_resource type="Resource" path="res://features/levels/level_1/level_01.tres" id="5_level1"]
-[ext_resource type="Resource" path="res://features/levels/level_2/level_02.tres" id="6_level2"]
+[ext_resource type="PackedScene" path="res://features/levels/level_1/level_01.tscn" id="5_level1"]
+[ext_resource type="PackedScene" path="res://features/levels/level_2/level_02.tscn" id="6_level2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -91,9 +90,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_idle")
 upgrades_scene = ExtResource("2_upgrades")
-level_scene = ExtResource("4_level")
-mission_1_definition = ExtResource("5_level1")
-mission_2_definition = ExtResource("6_level2")
+mission_1_scene = ExtResource("5_level1")
+mission_2_scene = ExtResource("6_level2")
 main_menu_scene_path = "res://features/menu/main_menu.tscn"
 
 [node name="Background" type="ColorRect" parent="."]
