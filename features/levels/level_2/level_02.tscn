@@ -1,0 +1,98 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://features/levels/base_level.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://features/notes/coin_note/coin_note.tscn" id="2_coin"]
+[ext_resource type="PackedScene" path="res://features/graph/level_graph_link.tscn" id="3_link"]
+[ext_resource type="PackedScene" path="res://features/graph/level_graph_lock.tscn" id="4_lock"]
+
+[node name="BaseLevel" instance=ExtResource("1_base")]
+
+[node name="center" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 296.0
+offset_right = 768.0
+offset_bottom = 392.0
+coin_capacity = 10
+prestige_reward = 1
+
+[node name="north" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 103.0
+offset_right = 768.0
+offset_bottom = 199.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="east" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 1075.0
+offset_top = 296.0
+offset_right = 1171.0
+offset_bottom = 392.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="south" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 489.0
+offset_right = 768.0
+offset_bottom = 585.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="west" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 269.0
+offset_top = 296.0
+offset_right = 365.0
+offset_bottom = 392.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="wwest" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 296.0
+offset_right = 134.0
+offset_bottom = 392.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="LinkNorth" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/north")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkNorth" instance=ExtResource("4_lock")]
+unlock_resource = &"cherry"
+unlock_cost = 10
+
+[node name="LinkEast" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/east")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkEast" instance=ExtResource("4_lock")]
+unlock_resource = &"bell"
+unlock_cost = 10
+
+[node name="LinkSouth" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/south")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSouth" instance=ExtResource("4_lock")]
+unlock_resource = &"seven"
+unlock_cost = 10
+
+[node name="LinkWest" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/west")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkWest" instance=ExtResource("4_lock")]
+unlock_resource = &"watermelon"
+unlock_cost = 10
+
+[node name="LinkFarWest" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/west")
+to_path = NodePath("../../Nodes/wwest")

@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://cy65cexfchyuj"]
+
+[ext_resource type="PackedScene" path="res://features/levels/base_level.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://features/notes/coin_note/coin_note.tscn" id="2_coin"]
+[ext_resource type="PackedScene" path="res://features/graph/level_graph_link.tscn" id="3_link"]
+[ext_resource type="PackedScene" path="res://features/graph/level_graph_lock.tscn" id="4_lock"]
+
+[node name="BaseLevel" unique_id=240283218 instance=ExtResource("1_base")]
+
+[node name="LinkWWest" parent="Layout/TopField/LevelGraph/Edges" index="0" unique_id=599136565 instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/west")
+to_path = NodePath("../../Nodes/wwest")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkWWest" index="1" unique_id=377548058 instance=ExtResource("4_lock")]
+position = Vector2(215.5, 344)
+unlock_resource = &"cherry"
+
+[node name="LinkNorth" parent="Layout/TopField/LevelGraph/Edges" index="1" unique_id=706091420 instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/north")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkNorth" index="1" unique_id=1581919439 instance=ExtResource("4_lock")]
+position = Vector2(720, 247.5)
+unlock_resource = &"cherry"
+
+[node name="LinkEast" parent="Layout/TopField/LevelGraph/Edges" index="2" unique_id=1917932457 instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/east")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkEast" index="1" unique_id=1421097884 instance=ExtResource("4_lock")]
+position = Vector2(921.5, 344)
+unlock_resource = &"bell"
+
+[node name="LinkSouth" parent="Layout/TopField/LevelGraph/Edges" index="3" unique_id=1524260833 instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/south")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSouth" index="1" unique_id=776305490 instance=ExtResource("4_lock")]
+position = Vector2(720, 440.5)
+unlock_resource = &"seven"
+
+[node name="LinkWest" parent="Layout/TopField/LevelGraph/Edges" index="4" unique_id=415489136 instance=ExtResource("3_link")]
+from_path = NodePath("../../Nodes/center")
+to_path = NodePath("../../Nodes/west")
+
+[node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkWest" index="1" unique_id=792752443 instance=ExtResource("4_lock")]
+position = Vector2(518.5, 344)
+unlock_resource = &"watermelon"
+
+[node name="center" parent="Layout/TopField/LevelGraph/Nodes" index="0" unique_id=752616961 instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 296.0
+offset_right = 768.0
+offset_bottom = 392.0
+
+[node name="north" parent="Layout/TopField/LevelGraph/Nodes" index="1" unique_id=1429717151 instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 103.0
+offset_right = 768.0
+offset_bottom = 199.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="east" parent="Layout/TopField/LevelGraph/Nodes" index="2" unique_id=2002837787 instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 1075.0
+offset_top = 296.0
+offset_right = 1171.0
+offset_bottom = 392.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="south" parent="Layout/TopField/LevelGraph/Nodes" index="3" unique_id=991752550 instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 489.0
+offset_right = 768.0
+offset_bottom = 585.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="west" parent="Layout/TopField/LevelGraph/Nodes" index="4" unique_id=905944800 instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 269.0
+offset_top = 296.0
+offset_right = 365.0
+offset_bottom = 392.0
+coin_capacity = 20
+prestige_reward = 2
+
+[node name="wwest" parent="Layout/TopField/LevelGraph/Nodes" index="5" unique_id=461838352 instance=ExtResource("2_coin")]
+layout_mode = 0
+offset_left = 66.0
+offset_top = 296.0
+offset_right = 162.0
+offset_bottom = 392.0
+coin_capacity = 30
+prestige_reward = 5
+
+[node name="LevelHud" parent="." index="2"]
+offset_left = -220.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 142.0
