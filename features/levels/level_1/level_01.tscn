@@ -67,7 +67,7 @@ to_path = NodePath("../../Nodes/left1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinLeft" instance=ExtResource("4_lock")]
 unlock_resource = &"cherry"
-unlock_cost = 10
+unlock_cost = 5
 
 [node name="LinkSpinMid" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
 from_path = NodePath("%SlotMachine/Spin")
@@ -75,7 +75,7 @@ to_path = NodePath("../../Nodes/mid1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinMid" instance=ExtResource("4_lock")]
 unlock_resource = &"bell"
-unlock_cost = 10
+unlock_cost = 5
 
 [node name="LinkSpinRight" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
 from_path = NodePath("%SlotMachine/Spin")
@@ -83,7 +83,7 @@ to_path = NodePath("../../Nodes/right1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinRight" instance=ExtResource("4_lock")]
 unlock_resource = &"seven"
-unlock_cost = 10
+unlock_cost = 5
 
 [node name="LinkLeft2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
 from_path = NodePath("../../Nodes/left1")
@@ -91,7 +91,7 @@ to_path = NodePath("../../Nodes/left2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkLeft2" instance=ExtResource("4_lock")]
 unlock_resource = &"watermelon"
-unlock_cost = 20
+unlock_cost = 10
 
 [node name="LinkMid2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
 from_path = NodePath("../../Nodes/mid1")
@@ -99,7 +99,7 @@ to_path = NodePath("../../Nodes/mid2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkMid2" instance=ExtResource("4_lock")]
 unlock_resource = &"diamond"
-unlock_cost = 20
+unlock_cost = 10
 
 [node name="LinkRight2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("3_link")]
 from_path = NodePath("../../Nodes/right1")
@@ -107,4 +107,4 @@ to_path = NodePath("../../Nodes/right2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkRight2" instance=ExtResource("4_lock")]
 unlock_resource = &"cherry"
-unlock_cost = 20
+unlock_cost = 10
