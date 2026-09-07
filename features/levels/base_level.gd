@@ -17,6 +17,7 @@ func _ready() -> void:
 	var graph := %LevelGraph as LevelGraph
 	graph.set_resource_icons(%SlotMachine.symbol_icon_map())
 	graph.node_clicked.connect(_on_node_clicked)
+	graph.prestige_earned.connect(_on_prestige_earned)
 	%SlotMachine.spin_started.connect(_on_spin_started)
 	%SlotMachine.spin_finished.connect(_on_spin_finished)
 	_refresh_hud()
@@ -47,9 +48,13 @@ func _on_spin_finished(results: Array[StringName]) -> void:
 	level_coins += payout.coins
 	_refresh_hud()
 	var graph := %LevelGraph as LevelGraph
-	level_prestige += graph.apply_resources(payout.resources)
-	_refresh_hud()
+	graph.apply_resources(payout.resources)
 	%SlotMachine.set_can_spin(spins_remaining > 0)
+
+
+func _on_prestige_earned(amount: int) -> void:
+	level_prestige += amount
+	_refresh_hud()
 
 
 func _bank_prestige() -> void:

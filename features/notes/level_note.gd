@@ -28,5 +28,9 @@ func deposit(_available: int) -> Vector2i:
 	return Vector2i.ZERO
 
 
+func remaining_capacity() -> int:
+	return 0
+
+
 func feed_leftover(_amount: int) -> Vector2i:
 	return Vector2i.ZERO

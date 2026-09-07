@@ -17,11 +17,14 @@ func is_full() -> bool:
 	return resource_capacity > 0 and collected >= resource_capacity
 
 
+func remaining_capacity() -> int:
+	return maxi(resource_capacity - collected, 0)
+
+
 func feed_leftover(amount: int) -> Vector2i:
-	if disabled or is_full() or amount <= 0 or resource_capacity <= 0:
+	if amount <= 0 or resource_capacity <= 0:
 		return Vector2i.ZERO
-	var needed := maxi(resource_capacity - collected, 0)
-	var used := mini(amount, needed)
+	var used := mini(amount, remaining_capacity())
 	collected += used
 	var prestige := 0
 	if is_full() and not _prestige_awarded:
