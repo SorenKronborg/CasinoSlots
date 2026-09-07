@@ -32,4 +32,4 @@ func contribute(resource: StringName, amount: int) -> int:
 
 func _refresh_requirement() -> void:
 	visible = is_locked()
-	%Amount.text = "%s/%s" % [collected, unlock_cost]
+	%Amount.text = str(maxi(unlock_cost - collected, 0))

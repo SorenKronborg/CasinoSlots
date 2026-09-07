@@ -1,7 +1,7 @@
 class_name BaseLevel
 extends Control
 
-const STARTING_SPINS := 50
+const STARTING_SPINS := 30
 
 @export_file("*.tscn") var idle_game_scene_path: String
 
@@ -24,13 +24,14 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
+	_bank_prestige()
 	get_tree().change_scene_to_file(idle_game_scene_path)
 
 
 func _on_spin_started() -> void:
 	spins_remaining = maxi(spins_remaining - 1, 0)
 	_refresh_hud()
-	%SlotMachine.set_can_spin(spins_remaining > 0)
+	%SlotMachine.set_can_spin(false)
 
 
 func _on_node_clicked(node_id: String) -> void:
@@ -44,10 +45,18 @@ func _on_node_clicked(node_id: String) -> void:
 func _on_spin_finished(results: Array[StringName]) -> void:
 	var payout: Winnings.Result = _winnings.evaluate(results)
 	level_coins += payout.coins
+	_refresh_hud()
 	var graph := %LevelGraph as LevelGraph
 	level_prestige += graph.apply_resources(payout.resources)
 	_refresh_hud()
 	%SlotMachine.set_can_spin(spins_remaining > 0)
+
+
+func _bank_prestige() -> void:
+	if level_prestige <= 0:
+		return
+	GameState.resources["prestige"] = int(GameState.resources.get("prestige", 0)) + level_prestige
+	level_prestige = 0
 
 
 func _refresh_hud() -> void:

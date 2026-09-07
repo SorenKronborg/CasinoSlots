@@ -25,9 +25,10 @@ func deposit(available: int) -> Vector2i:
 	if is_full() and not _prestige_awarded:
 		_prestige_awarded = true
 		prestige = prestige_reward
+		show_completed()
 	_refresh_deposit()
 	return Vector2i(1, prestige)
 
 
 func _refresh_deposit() -> void:
-	%DepositAmount.text = "%s/%s" % [collected, coin_capacity]
+	%DepositAmount.text = str(maxi(coin_capacity - collected, 0))

@@ -1,11 +1,26 @@
 class_name LevelGraph
 extends Control
 
+const TOKEN_SCENE := preload("res://features/graph/resource_token.tscn")
+
 signal node_clicked(node_id: String)
+
+@export var token_size := 28.0
+@export var token_speed := 275.0
+@export var token_spacing := 36.0
 
 var _notes_by_id: Dictionary = {}
 var _links: Array[LevelGraphLink] = []
+var _graph_links: Array[LevelGraphLink] = []
 var _note_order: Array[LevelNote] = []
+var _resource_icons: Dictionary = {}
+var _in_flight: Dictionary = {}
+
+
+class Delivery:
+	var resource: StringName = &""
+	var lock: LevelGraphLock
+	var points: PackedVector2Array = PackedVector2Array()
 
 
 func _ready() -> void:
@@ -15,9 +30,11 @@ func _ready() -> void:
 	_refresh_links()
 	_refresh_node_access()
 	resized.connect(_refresh_links)
+	_refresh_links.call_deferred()
 
 
 func set_resource_icons(icons: Dictionary) -> void:
+	_resource_icons = icons
 	for link in _links:
 		link.set_resource_icons(icons)
 
@@ -30,32 +47,213 @@ func deposit_into(node_id: String, available_coins: int) -> Vector2i:
 
 
 func apply_resources(gained: Dictionary) -> int:
+	_refresh_links()
 	var leftover_total := 0
+	var deliveries: Array[Delivery] = []
+	var planned: Dictionary = {}
 	for resource in gained:
+		var resource_id := resource as StringName
 		var remaining := int(gained[resource])
-		if remaining <= 0:
+		while remaining > 0:
+			var lock := _next_lock_for(resource_id, planned)
+			if lock == null:
+				break
+			remaining -= _plan_into_lock(lock, resource_id, remaining, planned, deliveries)
+		leftover_total += maxi(remaining, 0)
+	for lock in planned:
+		_in_flight[lock] = int(_in_flight.get(lock, 0)) + int(planned[lock])
+	_play_deliveries(deliveries)
+	var prestige := _feed_silos(leftover_total)
+	return prestige
+
+
+func _next_lock_for(resource: StringName, planned: Dictionary) -> LevelGraphLock:
+	var reachable := _reachable_ids(planned)
+	for link in _graph_links:
+		if not bool(reachable.get(link.from_id(), false)):
 			continue
-		for link in _links:
-			remaining = link.contribute(resource, remaining)
-		leftover_total += remaining
+		var lock := _front_lock(link, planned)
+		if lock != null and lock.unlock_resource == resource:
+			return lock
+	return null
+
+
+func _front_lock(link: LevelGraphLink, planned: Dictionary) -> LevelGraphLock:
+	for lock in link.locks():
+		if lock.collected + _incoming(lock, planned) < lock.unlock_cost:
+			return lock
+	return null
+
+
+func _plan_into_lock(
+		lock: LevelGraphLock,
+		resource: StringName,
+		remaining: int,
+		planned: Dictionary,
+		deliveries: Array[Delivery]
+) -> int:
+	var extra := _incoming(lock, planned)
+	var used := mini(remaining, lock.unlock_cost - lock.collected - extra)
+	planned[lock] = int(planned.get(lock, 0)) + used
+	var path := _path_to_lock(lock)
+	for _i in used:
+		var delivery := Delivery.new()
+		delivery.resource = resource
+		delivery.lock = lock
+		delivery.points = path
+		deliveries.append(delivery)
+	return used
+
+
+func _incoming(lock: LevelGraphLock, planned: Dictionary) -> int:
+	return int(_in_flight.get(lock, 0)) + int(planned.get(lock, 0))
+
+
+func _play_deliveries(deliveries: Array[Delivery]) -> void:
+	if deliveries.is_empty():
+		return
+	var spawned_on_lock: Dictionary = {}
+	for delivery in deliveries:
+		var index := int(spawned_on_lock.get(delivery.lock, 0))
+		spawned_on_lock[delivery.lock] = index + 1
+		var delay := 0.0
+		if token_speed > 0.0:
+			delay = float(index) * token_spacing / token_speed
+		var token := TOKEN_SCENE.instantiate() as ResourceToken
+		%Tokens.add_child(token)
+		token.arrived.connect(
+				_on_token_arrived.bind(delivery.lock, delivery.resource),
+				CONNECT_ONE_SHOT
+		)
+		var icon: Texture2D = _resource_icons.get(delivery.resource) as Texture2D
+		token.begin(delivery.points, token_speed, icon, token_size, delay)
+
+
+func _on_token_arrived(lock: LevelGraphLock, resource: StringName) -> void:
+	if is_instance_valid(lock):
+		lock.contribute(resource, 1)
+		_in_flight[lock] = maxi(int(_in_flight.get(lock, 0)) - 1, 0)
+		if int(_in_flight[lock]) <= 0:
+			_in_flight.erase(lock)
+	_refresh_node_access()
+
+
+func _feed_silos(leftover_total: int) -> int:
 	var prestige := 0
 	var reachable := _reachable_ids()
 	for note in _note_order:
+		if leftover_total <= 0:
+			break
 		if not bool(reachable.get(note.note_id(), false)):
 			continue
 		var fed: Vector2i = note.feed_leftover(leftover_total)
 		leftover_total -= fed.x
 		prestige += fed.y
-		if leftover_total <= 0:
-			break
-	_refresh_node_access()
 	return prestige
+
+
+func _path_to_lock(lock: LevelGraphLock) -> PackedVector2Array:
+	var owner_link := lock.get_parent() as LevelGraphLink
+	if owner_link == null:
+		return PackedVector2Array()
+	var start_id := _flow_start_id()
+	var chain: Array[LevelGraphLink] = _links_to_owner(start_id, owner_link)
+	var points := PackedVector2Array()
+	for i in chain.size():
+		var link_points := _link_points_in_graph(chain[i])
+		if i == chain.size() - 1:
+			link_points = _polyline_until(link_points, _to_graph_local(lock.global_position))
+		_append_polyline(points, link_points)
+	return points
+
+
+func _flow_start_id() -> String:
+	for link in _graph_links:
+		if not link.from_is_note():
+			return link.from_id()
+	return ""
+
+
+func _links_to_owner(start_id: String, owner_link: LevelGraphLink) -> Array[LevelGraphLink]:
+	if start_id == "" or start_id == owner_link.from_id():
+		return [owner_link]
+	var visited: Dictionary = {start_id: true}
+	var came_via: Dictionary = {}
+	var queue: Array[String] = [start_id]
+	while not queue.is_empty():
+		var node_id: String = queue.pop_front()
+		if node_id == owner_link.from_id():
+			break
+		for link in _graph_links:
+			if link.from_id() != node_id:
+				continue
+			var to_id := link.to_id()
+			if to_id == "" or visited.get(to_id, false):
+				continue
+			visited[to_id] = true
+			came_via[to_id] = link
+			queue.append(to_id)
+	var reversed: Array[LevelGraphLink] = []
+	var cursor := owner_link.from_id()
+	while came_via.has(cursor):
+		var via: LevelGraphLink = came_via[cursor]
+		reversed.append(via)
+		cursor = via.from_id()
+	reversed.reverse()
+	reversed.append(owner_link)
+	return reversed
+
+
+func _link_points_in_graph(link: LevelGraphLink) -> PackedVector2Array:
+	link.refresh()
+	var line := link.get_node_or_null("Line") as Line2D
+	var points := PackedVector2Array()
+	if line == null:
+		return points
+	for point in line.points:
+		points.append(_to_graph_local(link.to_global(point)))
+	return points
+
+
+func _to_graph_local(global_point: Vector2) -> Vector2:
+	return get_global_transform().affine_inverse() * global_point
+
+
+func _append_polyline(into: PackedVector2Array, extra: PackedVector2Array) -> void:
+	for i in extra.size():
+		var point := extra[i]
+		if not into.is_empty() and i == 0 and into[into.size() - 1].distance_to(point) < 1.0:
+			continue
+		into.append(point)
+
+
+func _polyline_until(points: PackedVector2Array, target: Vector2) -> PackedVector2Array:
+	var trimmed := PackedVector2Array()
+	if points.is_empty():
+		trimmed.append(target)
+		return trimmed
+	trimmed.append(points[0])
+	for i in range(1, points.size()):
+		var from_point := points[i - 1]
+		var to_point := points[i]
+		var along := to_point - from_point
+		var length_sq := along.length_squared()
+		if length_sq <= 0.0001:
+			continue
+		var t := (target - from_point).dot(along) / length_sq
+		if t >= 0.0 and t <= 1.0:
+			trimmed.append(from_point.lerp(to_point, t))
+			return trimmed
+		trimmed.append(to_point)
+	trimmed.append(target)
+	return trimmed
 
 
 func _collect() -> void:
 	_notes_by_id.clear()
 	_note_order.clear()
 	_links.clear()
+	_graph_links.clear()
 	for child in %Nodes.get_children():
 		var note := child as LevelNote
 		if note == null:
@@ -67,16 +265,26 @@ func _collect() -> void:
 		if link == null:
 			continue
 		_links.append(link)
+		if link.is_graph_link():
+			_graph_links.append(link)
 
 
-func _reachable_ids() -> Dictionary:
+func _reachable_ids(planned: Dictionary = {}) -> Dictionary:
 	var reachable: Dictionary = {}
 	var has_incoming: Dictionary = {}
-	for link in _links:
+	for link in _graph_links:
 		if link.to_id() == "":
 			continue
 		has_incoming[link.to_id()] = true
 	var queue: Array[String] = []
+	for link in _graph_links:
+		if link.from_is_note():
+			continue
+		var start_id := link.from_id()
+		if start_id == "" or reachable.get(start_id, false):
+			continue
+		reachable[start_id] = true
+		queue.append(start_id)
 	for note in _note_order:
 		var node_id := note.note_id()
 		if has_incoming.get(node_id, false):
@@ -85,8 +293,8 @@ func _reachable_ids() -> Dictionary:
 		queue.append(node_id)
 	while not queue.is_empty():
 		var node_id: String = queue.pop_front()
-		for link in _links:
-			if not link.is_fully_unlocked() or link.from_id() != node_id:
+		for link in _graph_links:
+			if link.from_id() != node_id or _front_lock(link, planned) != null:
 				continue
 			var to_id := link.to_id()
 			if to_id == "" or reachable.get(to_id, false):

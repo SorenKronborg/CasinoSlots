@@ -27,9 +27,10 @@ func feed_leftover(amount: int) -> Vector2i:
 	if is_full() and not _prestige_awarded:
 		_prestige_awarded = true
 		prestige = prestige_reward
+		show_completed()
 	_refresh_amount()
 	return Vector2i(used, prestige)
 
 
 func _refresh_amount() -> void:
-	%DepositAmount.text = "%s/%s" % [collected, resource_capacity]
+	%DepositAmount.text = str(maxi(resource_capacity - collected, 0))

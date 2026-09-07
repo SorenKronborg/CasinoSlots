@@ -52,6 +52,6 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
 theme_override_font_sizes/font_size = 18
-text = "0/10"
+text = "10"
 horizontal_alignment = 1
 vertical_alignment = 1

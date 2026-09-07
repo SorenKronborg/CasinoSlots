@@ -23,11 +23,12 @@ func to_id() -> String:
 	return _note_id(to_path)
 
 
-func is_fully_unlocked() -> bool:
-	for lock in locks():
-		if lock.is_locked():
-			return false
-	return true
+func is_graph_link() -> bool:
+	return _note_at(to_path) is LevelNote
+
+
+func from_is_note() -> bool:
+	return _note_at(from_path) is LevelNote
 
 
 func locks() -> Array[LevelGraphLock]:
@@ -37,13 +38,6 @@ func locks() -> Array[LevelGraphLock]:
 		if lock != null:
 			result.append(lock)
 	return result
-
-
-func contribute(resource: StringName, amount: int) -> int:
-	for lock in locks():
-		if lock.is_locked():
-			return lock.contribute(resource, amount)
-	return amount
 
 
 func set_resource_icons(icons: Dictionary) -> void:

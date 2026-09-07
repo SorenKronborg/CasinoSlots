@@ -1,5 +1,5 @@
 class_name SlotMachine
-extends HBoxContainer
+extends Control
 
 signal spin_started
 signal spin_finished(results: Array[StringName])
