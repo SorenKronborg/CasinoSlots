@@ -19,7 +19,7 @@ func _ready() -> void:
 
 func _refresh_resource_info() -> void:
 	%PrestigeLabel.text = tr("Prestige")
-	%PrestigeValue.text = str(GameState.resources["prestige"])
+	%PrestigeValue.text = str(GameState.prestige())
 
 
 func _on_save_game_pressed() -> void:
