@@ -1,8 +1,10 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://features/levels/base_level.gd" id="1_base"]
 [ext_resource type="Script" path="res://features/graph/level_graph.gd" id="2_graph"]
 [ext_resource type="PackedScene" path="res://features/slot_machine/slot_machine.tscn" id="3_slot"]
+[ext_resource type="PackedScene" path="res://features/graph/resource_token.tscn" id="4_heart"]
+[ext_resource type="Texture2D" path="res://assets/icons/heart.png" id="5_heart"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -71,6 +73,34 @@ content_margin_top = 8.0
 content_margin_right = 12.0
 content_margin_bottom = 8.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.1, 1)
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_help_on"]
+bg_color = Color(1, 0.85, 0.1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.95, 0.45, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 24.0
+content_margin_top = 10.0
+content_margin_right = 24.0
+content_margin_bottom = 10.0
+
 [node name="BaseLevel" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -79,6 +109,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_base")
+heart_scene = ExtResource("4_heart")
+heart_icon = ExtResource("5_heart")
 idle_game_scene_path = "res://features/game_idle/idle_game_scene.tscn"
 
 [node name="Background" type="ColorRect" parent="."]
@@ -148,6 +180,38 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="SpinsBadge" type="HBoxContainer" parent="Layout/BottomField"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -266.0
+offset_top = -48.0
+offset_right = -106.0
+offset_bottom = -4.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="SpinsLabel" type="Label" parent="Layout/BottomField/SpinsBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Spins"
+vertical_alignment = 1
+
+[node name="SpinsValue" type="Label" parent="Layout/BottomField/SpinsBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "25"
+vertical_alignment = 1
+
 [node name="LevelHud" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = 1
@@ -156,7 +220,7 @@ anchor_right = 1.0
 offset_left = -220
 offset_top = 16
 offset_right = -16
-offset_bottom = 142
+offset_bottom = 100
 grow_horizontal = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_info")
@@ -205,25 +269,24 @@ theme_override_font_sizes/font_size = 18
 text = "0"
 horizontal_alignment = 2
 
-[node name="SpinsRow" type="HBoxContainer" parent="LevelHud/Rows"]
-layout_mode = 2
-theme_override_constants/separation = 8
+[node name="PrestigeFlights" type="Node2D" parent="."]
+unique_name_in_owner = true
+z_index = 40
 
-[node name="SpinsLabel" type="Label" parent="LevelHud/Rows/SpinsRow"]
+[node name="HelpTooltip" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 50
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
+
+[node name="HelpTooltipText" type="Label" parent="HelpTooltip"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
-text = "Spins"
-
-[node name="SpinsValue" type="Label" parent="LevelHud/Rows/SpinsRow"]
-unique_name_in_owner = true
-layout_mode = 2
+mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
-theme_override_font_sizes/font_size = 18
-text = "25"
-horizontal_alignment = 2
+theme_override_font_sizes/font_size = 14
+text = ""
 
 [node name="Back" type="Button" parent="."]
 unique_name_in_owner = true
@@ -236,4 +299,21 @@ offset_bottom = 64.0
 theme = SubResource("Theme_buttons")
 text = "Back"
 
+[node name="Help" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 48)
+layout_mode = 1
+offset_left = 172.0
+offset_top = 16.0
+offset_right = 312.0
+offset_bottom = 64.0
+theme = SubResource("Theme_buttons")
+toggle_mode = true
+theme_override_colors/font_pressed_color = Color(0.08, 0.08, 0.08, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.08, 0.08, 0.08, 1)
+theme_override_styles/pressed = SubResource("StyleBoxFlat_help_on")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_help_on")
+text = "Help"
+
 [connection signal="pressed" from="Back" to="." method="_on_back_pressed"]
+[connection signal="toggled" from="Help" to="." method="_on_help_toggled"]

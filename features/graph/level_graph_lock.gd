@@ -6,6 +6,8 @@ extends Node2D
 
 var collected: int = 0
 
+var _displayed_remaining := -1
+
 
 func _ready() -> void:
 	_refresh_requirement()
@@ -32,4 +34,10 @@ func contribute(resource: StringName, amount: int) -> int:
 
 func _refresh_requirement() -> void:
 	visible = is_locked()
-	%Amount.text = str(maxi(unlock_cost - collected, 0))
+	var remaining := maxi(unlock_cost - collected, 0)
+	var decreased := _displayed_remaining >= 0 and remaining < _displayed_remaining
+	_displayed_remaining = remaining
+	var amount_label := %Amount as Label
+	amount_label.text = str(remaining)
+	if decreased:
+		CounterPulse.play(amount_label)

@@ -34,3 +34,7 @@ func remaining_capacity() -> int:
 
 func feed_leftover(_amount: int) -> Vector2i:
 	return Vector2i.ZERO
+
+
+func help_text() -> String:
+	return tr("Note Help")

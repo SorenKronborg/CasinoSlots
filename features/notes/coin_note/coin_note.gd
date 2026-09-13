@@ -6,11 +6,16 @@ extends LevelNote
 
 var collected: int = 0
 var _prestige_awarded := false
+var _displayed_remaining := -1
 
 
 func _ready() -> void:
 	text = ""
 	_refresh_deposit()
+
+
+func help_text() -> String:
+	return tr("Coin Note Help") % [coin_capacity, prestige_reward]
 
 
 func is_full() -> bool:
@@ -31,4 +36,10 @@ func deposit(available: int) -> Vector2i:
 
 
 func _refresh_deposit() -> void:
-	%DepositAmount.text = str(maxi(coin_capacity - collected, 0))
+	var remaining := maxi(coin_capacity - collected, 0)
+	var decreased := _displayed_remaining >= 0 and remaining < _displayed_remaining
+	_displayed_remaining = remaining
+	var amount_label := %DepositAmount as Label
+	amount_label.text = str(remaining)
+	if decreased:
+		CounterPulse.play(amount_label)

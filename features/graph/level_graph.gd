@@ -4,7 +4,7 @@ extends Control
 const TOKEN_SCENE := preload("res://features/graph/resource_token.tscn")
 
 signal node_clicked(node_id: String)
-signal prestige_earned(amount: int)
+signal prestige_earned(amount: int, from_global_position: Vector2)
 
 @export var token_size := 28.0
 @export var token_speed := 275.0
@@ -34,17 +34,28 @@ func _ready() -> void:
 	_refresh_links.call_deferred()
 
 
+func notes() -> Array[LevelNote]:
+	return _note_order
+
+
 func set_resource_icons(icons: Dictionary) -> void:
 	_resource_icons = icons
 	for link in _links:
 		link.set_resource_icons(icons)
 
 
-func deposit_into(node_id: String, available_coins: int) -> Vector2i:
+func deposit_into(node_id: String, available_coins: int) -> int:
 	if not _notes_by_id.has(node_id):
-		return Vector2i.ZERO
+		return 0
 	var note := _notes_by_id[node_id] as LevelNote
-	return note.deposit(available_coins)
+	var spent_and_earned := note.deposit(available_coins)
+	if spent_and_earned.y > 0:
+		prestige_earned.emit(spent_and_earned.y, _note_center_global(note))
+	return spent_and_earned.x
+
+
+func _note_center_global(note: LevelNote) -> Vector2:
+	return note.get_global_rect().get_center()
 
 
 func apply_resources(gained: Dictionary) -> void:
@@ -172,7 +183,7 @@ func _on_token_arrived(target: Node, resource: StringName) -> void:
 	if note != null:
 		var fed: Vector2i = note.feed_leftover(1)
 		if fed.y > 0:
-			prestige_earned.emit(fed.y)
+			prestige_earned.emit(fed.y, _note_center_global(note))
 	_refresh_node_access()
 
 
