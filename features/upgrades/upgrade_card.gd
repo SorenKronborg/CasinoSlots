@@ -6,10 +6,15 @@ signal purchased
 var upgrade: UpgradeDefinition
 
 @onready var _title: Label = %Title
+@onready var _rank: Label = %Rank
 @onready var _price_row: HBoxContainer = %PriceRow
 @onready var _price: Label = %Price
 @onready var _tooltip: PanelContainer = %Tooltip
 @onready var _tooltip_text: Label = %TooltipText
+
+const AVAILABLE_COLOR := Color.WHITE
+const UNAVAILABLE_COLOR := Color(0.42, 0.44, 0.42, 1)
+const COMPLETED_COLOR := Color(0.45, 0.9, 0.55, 1)
 
 
 func setup(definition: UpgradeDefinition) -> void:
@@ -27,14 +32,19 @@ func refresh() -> void:
 	_title.text = tr(upgrade.title)
 	_tooltip_text.text = upgrade.description
 	var rank := GameState.rank_of(upgrade.id)
+	_rank.text = "%d/%d" % [rank, upgrade.max_rank()]
 	if upgrade.is_maxed(rank):
 		_price_row.visible = false
 		disabled = true
+		modulate = COMPLETED_COLOR
 		return
 	var cost := upgrade.next_cost(rank)
 	_price.text = str(cost)
 	_price_row.visible = true
-	disabled = false
+	var available := GameState.is_upgrade_unlocked(upgrade.id)
+	var affordable := GameState.prestige() >= cost
+	disabled = not available or not affordable
+	modulate = AVAILABLE_COLOR if not disabled else UNAVAILABLE_COLOR
 
 
 func _on_pressed() -> void:

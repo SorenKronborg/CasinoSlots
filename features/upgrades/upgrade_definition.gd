@@ -5,6 +5,9 @@ var id: StringName = &""
 var title: String = ""
 var description: String = ""
 var costs: Array[int] = []
+var prerequisite_id: StringName = &""
+var prerequisite_rank := 0
+var graph_position := Vector2.ZERO
 
 
 func max_rank() -> int:
@@ -22,3 +25,11 @@ func next_cost(purchased_rank: int) -> int:
 
 func is_maxed(purchased_rank: int) -> bool:
 	return purchased_rank >= max_rank()
+
+
+func has_prerequisite() -> bool:
+	return prerequisite_id != &"" and prerequisite_rank > 0
+
+
+func prerequisite_met(purchased_rank: int) -> bool:
+	return not has_prerequisite() or purchased_rank >= prerequisite_rank

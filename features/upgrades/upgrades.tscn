@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://features/upgrades/upgrades.gd" id="1_upgrades"]
+[ext_resource type="PackedScene" path="res://features/upgrades/upgrade_card.tscn" id="2_card"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -71,6 +72,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_upgrades")
+card_scene = ExtResource("2_card")
 idle_game_scene_path = "res://features/game_idle/idle_game_scene.tscn"
 
 [node name="Background" type="ColorRect" parent="."]
@@ -105,7 +107,27 @@ theme_override_colors/font_color = Color(1, 0.92, 0.4, 1)
 theme_override_font_sizes/font_size = 22
 text = "0"
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="GraphArea" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -480.0
+offset_top = -250.0
+offset_right = 480.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Connections" type="Node2D" parent="GraphArea"]
+unique_name_in_owner = true
+
+[node name="Cards" type="Control" parent="GraphArea"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -113,13 +135,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-
-[node name="Cards" type="VBoxContainer" parent="Center"]
-unique_name_in_owner = true
-layout_mode = 2
 theme = SubResource("Theme_buttons")
-theme_override_constants/separation = 20
-alignment = 1
 
 [node name="Back" type="Button" parent="."]
 unique_name_in_owner = true

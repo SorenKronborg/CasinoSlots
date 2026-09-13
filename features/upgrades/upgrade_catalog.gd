@@ -29,6 +29,9 @@ static func _extra_wheel() -> UpgradeDefinition:
 	upgrade.title = "Extra Wheel"
 	upgrade.description = "Adds an extra wheel to your slot machine."
 	upgrade.costs = [5]
+	upgrade.prerequisite_id = EXTRA_SPIN
+	upgrade.prerequisite_rank = 5
+	upgrade.graph_position = Vector2(560, 310)
 	return upgrade
 
 
@@ -38,6 +41,9 @@ static func _prestige_income() -> UpgradeDefinition:
 	upgrade.title = "Prestige Income"
 	upgrade.description = "Whenever you receive prestige you will receive +1."
 	upgrade.costs = [3]
+	upgrade.prerequisite_id = COIN_INCOME
+	upgrade.prerequisite_rank = 3
+	upgrade.graph_position = Vector2(560, 90)
 	return upgrade
 
 
@@ -47,6 +53,7 @@ static func _coin_income() -> UpgradeDefinition:
 	upgrade.title = "Coin Income"
 	upgrade.description = "Whenever you receive coins you will get +1."
 	upgrade.costs = [1, 3, 5]
+	upgrade.graph_position = Vector2(80, 90)
 	return upgrade
 
 
@@ -56,4 +63,5 @@ static func _extra_spin() -> UpgradeDefinition:
 	upgrade.title = "Extra Spin"
 	upgrade.description = "Adds 1 more spin each time you enter a level."
 	upgrade.costs = [1, 3, 5, 7, 10]
+	upgrade.graph_position = Vector2(80, 310)
 	return upgrade

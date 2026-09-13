@@ -47,9 +47,18 @@ func has_extra_wheel() -> bool:
 	return rank_of(UpgradeCatalog.EXTRA_WHEEL) > 0
 
 
-func try_purchase(upgrade_id: StringName) -> bool:
+func is_upgrade_unlocked(upgrade_id: StringName) -> bool:
 	var upgrade := UpgradeCatalog.by_id(upgrade_id)
 	if upgrade == null:
+		return false
+	if not upgrade.has_prerequisite():
+		return true
+	return upgrade.prerequisite_met(rank_of(upgrade.prerequisite_id))
+
+
+func try_purchase(upgrade_id: StringName) -> bool:
+	var upgrade := UpgradeCatalog.by_id(upgrade_id)
+	if upgrade == null or not is_upgrade_unlocked(upgrade_id):
 		return false
 	var current_rank := rank_of(upgrade_id)
 	if upgrade.is_maxed(current_rank):
