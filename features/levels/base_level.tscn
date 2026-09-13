@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://features/levels/base_level.gd" id="1_base"]
 [ext_resource type="Script" path="res://features/graph/level_graph.gd" id="2_graph"]
 [ext_resource type="PackedScene" path="res://features/slot_machine/slot_machine.tscn" id="3_slot"]
 [ext_resource type="PackedScene" path="res://features/graph/resource_token.tscn" id="4_heart"]
 [ext_resource type="Texture2D" path="res://assets/icons/heart.png" id="5_heart"]
+[ext_resource type="AudioStream" path="res://assets/audio/coin.wav" id="6_coin"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -314,6 +315,11 @@ theme_override_colors/font_hover_pressed_color = Color(0.08, 0.08, 0.08, 1)
 theme_override_styles/pressed = SubResource("StyleBoxFlat_help_on")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_help_on")
 text = "Help"
+
+[node name="CoinSound" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("6_coin")
+volume_db = -4.0
 
 [connection signal="pressed" from="Back" to="." method="_on_back_pressed"]
 [connection signal="toggled" from="Help" to="." method="_on_help_toggled"]

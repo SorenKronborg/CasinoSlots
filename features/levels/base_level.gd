@@ -51,8 +51,17 @@ func _on_spin_started() -> void:
 
 func _on_node_clicked(node_id: String) -> void:
 	var graph := %LevelGraph as LevelGraph
-	level_coins -= graph.deposit_into(node_id, level_coins)
+	var coins_spent := graph.deposit_into(node_id, level_coins)
+	if coins_spent > 0:
+		_play_coin_sound()
+	level_coins -= coins_spent
 	_refresh_hud()
+
+
+func _play_coin_sound() -> void:
+	var player := %CoinSound as AudioStreamPlayer
+	player.stop()
+	player.play()
 
 
 func _on_spin_finished(results: Array[StringName]) -> void:
