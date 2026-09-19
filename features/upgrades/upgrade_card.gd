@@ -5,6 +5,7 @@ signal purchased
 
 var upgrade: UpgradeDefinition
 
+@onready var _contents: Control = $Contents
 @onready var _title: Label = %Title
 @onready var _rank: Label = %Rank
 @onready var _price_row: HBoxContainer = %PriceRow
@@ -15,6 +16,8 @@ var upgrade: UpgradeDefinition
 const AVAILABLE_COLOR := Color.WHITE
 const UNAVAILABLE_COLOR := Color(0.42, 0.44, 0.42, 1)
 const COMPLETED_COLOR := Color(0.45, 0.9, 0.55, 1)
+const CONTENT_PADDING := Vector2(24, 12)
+const MIN_HEIGHT := 40.0
 
 
 func setup(definition: UpgradeDefinition) -> void:
@@ -33,6 +36,18 @@ func refresh() -> void:
 	_tooltip_text.text = upgrade.description
 	var rank := GameState.rank_of(upgrade.id)
 	_rank.text = "%d/%d" % [rank, upgrade.max_rank()]
+	_apply_availability(rank)
+	shrink_to_contents()
+
+
+func shrink_to_contents() -> void:
+	var needed := _contents.get_combined_minimum_size()
+	var box := Vector2(needed.x + CONTENT_PADDING.x, maxf(needed.y + CONTENT_PADDING.y, MIN_HEIGHT))
+	custom_minimum_size = box
+	size = box
+
+
+func _apply_availability(rank: int) -> void:
 	if upgrade.is_maxed(rank):
 		_price_row.visible = false
 		disabled = true
