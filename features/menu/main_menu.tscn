@@ -1,8 +1,9 @@
-[gd_scene format=3 uid="uid://chciinc0ouvqi"]
+[gd_scene load_steps=8 format=3 uid="uid://chciinc0ouvqi"]
 
 [ext_resource type="Script" uid="uid://hbepm1gdeov2" path="res://features/menu/main_menu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://features/game_idle/idle_game_scene.tscn" id="2_idle"]
 [ext_resource type="PackedScene" path="res://features/options/options.tscn" id="3_options"]
+[ext_resource type="Texture2D" path="res://assets/background/background1.jpg" id="4_bg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
 content_margin_left = 24.0
@@ -74,7 +75,7 @@ script = ExtResource("1_menu")
 idle_game_scene = ExtResource("2_idle")
 options_scene = ExtResource("3_options")
 
-[node name="Background" type="ColorRect" parent="." unique_id=249299132]
+[node name="Background" type="TextureRect" parent="." unique_id=249299132]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -82,7 +83,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.03, 0.1, 0.04, 1)
+texture = ExtResource("4_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="Center" type="CenterContainer" parent="." unique_id=1824527862]
 layout_mode = 1

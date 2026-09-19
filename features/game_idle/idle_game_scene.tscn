@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://features/game_idle/idle_game_scene.gd" id="1_idle"]
 [ext_resource type="PackedScene" path="res://features/upgrades/upgrades.tscn" id="2_upgrades"]
 [ext_resource type="Texture2D" path="res://assets/icons/crown.svg" id="3_crown"]
+[ext_resource type="Texture2D" path="res://assets/background/background2.jpg" id="4_bg"]
 [ext_resource type="PackedScene" path="res://features/levels/level_1/level_01.tscn" id="5_level1"]
 [ext_resource type="PackedScene" path="res://features/levels/level_2/level_02.tscn" id="6_level2"]
 
@@ -94,7 +95,7 @@ mission_1_scene = ExtResource("5_level1")
 mission_2_scene = ExtResource("6_level2")
 main_menu_scene_path = "res://features/menu/main_menu.tscn"
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -102,7 +103,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.03, 0.1, 0.04, 1)
+texture = ExtResource("4_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="TopLeftButtons" type="VBoxContainer" parent="."]
 layout_mode = 1

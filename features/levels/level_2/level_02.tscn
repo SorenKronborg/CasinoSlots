@@ -10,82 +10,82 @@
 
 [node name="left1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 360.0
-offset_top = 500.0
-offset_right = 456.0
-offset_bottom = 596.0
+offset_left = 384.0
+offset_top = 524.0
+offset_right = 432.0
+offset_bottom = 572.0
 coin_capacity = 10
 prestige_reward = 1
 
 [node name="mid1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 672.0
-offset_top = 500.0
-offset_right = 768.0
-offset_bottom = 596.0
+offset_left = 696.0
+offset_top = 524.0
+offset_right = 744.0
+offset_bottom = 572.0
 coin_capacity = 10
 prestige_reward = 1
 
 [node name="right1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 984.0
-offset_top = 500.0
-offset_right = 1080.0
-offset_bottom = 596.0
+offset_left = 1008.0
+offset_top = 524.0
+offset_right = 1056.0
+offset_bottom = 572.0
 coin_capacity = 10
 prestige_reward = 1
 
 [node name="left2" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 360.0
-offset_top = 320.0
-offset_right = 456.0
-offset_bottom = 416.0
+offset_left = 384.0
+offset_top = 344.0
+offset_right = 432.0
+offset_bottom = 392.0
 coin_capacity = 20
 prestige_reward = 2
 
 [node name="mid2" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 672.0
-offset_top = 320.0
-offset_right = 768.0
-offset_bottom = 416.0
+offset_left = 696.0
+offset_top = 344.0
+offset_right = 744.0
+offset_bottom = 392.0
 coin_capacity = 20
 prestige_reward = 2
 
 [node name="right2" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 984.0
-offset_top = 320.0
-offset_right = 1080.0
-offset_bottom = 416.0
+offset_left = 1008.0
+offset_top = 344.0
+offset_right = 1056.0
+offset_bottom = 392.0
 coin_capacity = 20
 prestige_reward = 2
 
 [node name="left3" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 360.0
-offset_top = 120.0
-offset_right = 456.0
-offset_bottom = 216.0
+offset_left = 384.0
+offset_top = 144.0
+offset_right = 432.0
+offset_bottom = 192.0
 coin_capacity = 30
 prestige_reward = 3
 
 [node name="mid3" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
-offset_left = 672.0
-offset_top = 120.0
-offset_right = 768.0
-offset_bottom = 216.0
+offset_left = 696.0
+offset_top = 144.0
+offset_right = 744.0
+offset_bottom = 192.0
 coin_capacity = 30
 prestige_reward = 3
 
 [node name="right3" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("3_silo")]
 layout_mode = 0
-offset_left = 984.0
-offset_top = 120.0
-offset_right = 1080.0
-offset_bottom = 216.0
+offset_left = 1008.0
+offset_top = 144.0
+offset_right = 1056.0
+offset_bottom = 192.0
 resource_capacity = 30
 prestige_reward = 3
 

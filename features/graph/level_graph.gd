@@ -28,6 +28,7 @@ func _ready() -> void:
 	_collect()
 	for note in _note_order:
 		note.pressed.connect(_on_node_pressed.bind(note.note_id()))
+	_connect_locks()
 	_refresh_links()
 	_refresh_node_access()
 	resized.connect(_refresh_links)
@@ -81,10 +82,25 @@ func _next_lock_for(resource: StringName, planned: Dictionary) -> LevelGraphLock
 	for link in _graph_links:
 		if not bool(reachable.get(link.from_id(), false)):
 			continue
+		if _is_opening(link):
+			continue
 		var lock := _front_lock(link, planned)
 		if lock != null and lock.unlock_resource == resource:
 			return lock
 	return null
+
+
+func _connect_locks() -> void:
+	for link in _links:
+		for lock in link.locks():
+			lock.unlock_finished.connect(_refresh_node_access)
+
+
+func _is_opening(link: LevelGraphLink) -> bool:
+	for lock in link.locks():
+		if lock.is_unlocking():
+			return true
+	return false
 
 
 func _front_lock(link: LevelGraphLink, planned: Dictionary) -> LevelGraphLock:
@@ -346,6 +362,8 @@ func _reachable_ids(planned: Dictionary = {}) -> Dictionary:
 		var node_id: String = queue.pop_front()
 		for link in _graph_links:
 			if link.from_id() != node_id or _front_lock(link, planned) != null:
+				continue
+			if _is_opening(link):
 				continue
 			var to_id := link.to_id()
 			if to_id == "" or reachable.get(to_id, false):
