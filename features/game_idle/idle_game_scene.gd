@@ -1,6 +1,7 @@
 extends Control
 
 @export var upgrades_scene: PackedScene
+@export var reward_list_scene: PackedScene
 @export var mission_1_scene: PackedScene
 @export var mission_2_scene: PackedScene
 @export_file("*.tscn") var main_menu_scene_path: String
@@ -9,6 +10,7 @@ extends Control
 func _ready() -> void:
 	%SaveGame.text = tr("Save Game")
 	%QuitGame.text = tr("Quit Game")
+	%RewardList.text = tr("Reward List")
 	%Upgrades.text = tr("Upgrades")
 	%Mission1.text = tr("Mission 1")
 	%Mission2.text = tr("Mission 2")
@@ -30,6 +32,10 @@ func _on_save_game_pressed() -> void:
 
 func _on_quit_game_pressed() -> void:
 	get_tree().change_scene_to_file(main_menu_scene_path)
+
+
+func _on_reward_list_pressed() -> void:
+	get_tree().change_scene_to_packed(reward_list_scene)
 
 
 func _on_upgrades_pressed() -> void:

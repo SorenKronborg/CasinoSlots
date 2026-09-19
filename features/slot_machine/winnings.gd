@@ -25,6 +25,10 @@ func _init(path: String = DEFAULT_PATH) -> void:
 	_load_csv(path)
 
 
+func rules() -> Array[Rule]:
+	return _rules
+
+
 func evaluate(reel_symbols: Array[StringName]) -> Result:
 	var counts: Dictionary = {}
 	for symbol in reel_symbols:

@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://features/game_idle/idle_game_scene.gd" id="1_idle"]
 [ext_resource type="PackedScene" path="res://features/upgrades/upgrades.tscn" id="2_upgrades"]
+[ext_resource type="PackedScene" path="res://features/rewards/reward_list.tscn" id="7_rewards"]
 [ext_resource type="Texture2D" path="res://assets/icons/crown.svg" id="3_crown"]
 [ext_resource type="Texture2D" path="res://assets/background/background2.jpg" id="4_bg"]
 [ext_resource type="PackedScene" path="res://features/levels/level_1/level_01.tscn" id="5_level1"]
@@ -91,6 +92,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_idle")
 upgrades_scene = ExtResource("2_upgrades")
+reward_list_scene = ExtResource("7_rewards")
 mission_1_scene = ExtResource("5_level1")
 mission_2_scene = ExtResource("6_level2")
 main_menu_scene_path = "res://features/menu/main_menu.tscn"
@@ -184,11 +186,22 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Upgrades" type="Button" parent="Center"]
+[node name="MenuButtons" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme = SubResource("Theme_buttons")
+theme_override_constants/separation = 16
+
+[node name="RewardList" type="Button" parent="Center/MenuButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-theme = SubResource("Theme_buttons")
+auto_translate_mode = 2
+text = "Reward List"
+
+[node name="Upgrades" type="Button" parent="Center/MenuButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
 auto_translate_mode = 2
 text = "Upgrades"
 
@@ -237,6 +250,7 @@ text = "Mission 4"
 
 [connection signal="pressed" from="TopLeftButtons/SaveGame" to="." method="_on_save_game_pressed"]
 [connection signal="pressed" from="TopLeftButtons/QuitGame" to="." method="_on_quit_game_pressed"]
-[connection signal="pressed" from="Center/Upgrades" to="." method="_on_upgrades_pressed"]
+[connection signal="pressed" from="Center/MenuButtons/RewardList" to="." method="_on_reward_list_pressed"]
+[connection signal="pressed" from="Center/MenuButtons/Upgrades" to="." method="_on_upgrades_pressed"]
 [connection signal="pressed" from="Missions/Mission1" to="." method="_on_mission_1_pressed"]
 [connection signal="pressed" from="Missions/Mission2" to="." method="_on_mission_2_pressed"]
