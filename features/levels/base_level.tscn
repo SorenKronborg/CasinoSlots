@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://features/levels/base_level.gd" id="1_base"]
 [ext_resource type="Script" path="res://features/graph/level_graph.gd" id="2_graph"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://features/graph/resource_token.tscn" id="4_heart"]
 [ext_resource type="Texture2D" path="res://assets/icons/heart.png" id="5_heart"]
 [ext_resource type="AudioStream" path="res://assets/audio/coin.wav" id="6_coin"]
+[ext_resource type="Texture2D" path="res://assets/background/background3.jpg" id="7_bg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -114,7 +115,8 @@ heart_scene = ExtResource("4_heart")
 heart_icon = ExtResource("5_heart")
 idle_game_scene_path = "res://features/game_idle/idle_game_scene.tscn"
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(0.58, 0.46, 0.54, 1)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -122,7 +124,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.03, 0.1, 0.04, 1)
+texture = ExtResource("7_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 1
