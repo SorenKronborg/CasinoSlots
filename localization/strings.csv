@@ -28,5 +28,8 @@ Reward List,Reward List,Liste des gains,Belohnungsliste
 Resources,Resources,Ressources,Ressourcen
 Reward List Hint,Matching symbols in one spin pay coins and resources.,Les symboles identiques d'un tour rapportent des pièces et des ressources.,Gleiche Symbole in einem Dreh geben Münzen und Ressourcen.
 Note Help,Graph note.,Note du graphe.,Graph-Note.
-Coin Note Help,Click to add 1 coin. %d coins pays %d prestige.,Cliquez pour 1 pièce. %d pièces donnent %d prestige.,Klick fügt 1 Münze hinzu. %d Münzen geben %d Prestige.
-Silo Note Help,Eats leftover resources. %d fills it for %d prestige.,Absorbe les restes. %d le remplit pour %d prestige.,Nimmt Restressourcen. %d füllen es für %d Prestige.
+Coin Note Help,Deposit %d coins to capture it and double resources passing through.,Déposez %d pièces pour la capturer et doubler les ressources qui la traversent.,Zahle %d Münzen ein um sie einzunehmen und durchlaufende Ressourcen zu verdoppeln.
+Silo Note Help,Consumes resources continuously. Every %d resources awards 1 prestige.,Consomme les ressources en continu. Toutes les %d ressources donnent 1 prestige.,Verbraucht fortlaufend Ressourcen. Je %d Ressourcen geben 1 Prestige.
+Key Card Note Help,Deposit %d coins to activate reusable key %s.,Déposez %d pièces pour activer la clé réutilisable %s.,Zahle %d Münzen ein um den wiederverwendbaren Schlüssel %s zu aktivieren.
+Key Gate Help,Requires key %s.,Nécessite la clé %s.,Benötigt Schlüssel %s.
+Firewall Help,Firewall: send %d %s resources to defeat it.,Pare-feu : envoyez %d ressources %s pour le vaincre.,Firewall: Sende %d %s-Ressourcen um ihn zu besiegen.

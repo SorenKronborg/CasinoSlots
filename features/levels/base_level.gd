@@ -28,6 +28,7 @@ func _ready() -> void:
 	graph.set_resource_icons(%SlotMachine.symbol_icon_map())
 	graph.node_clicked.connect(_on_node_clicked)
 	graph.prestige_earned.connect(_on_prestige_earned)
+	graph.coin_stolen.connect(_on_coin_stolen)
 	%SlotMachine.spin_started.connect(_on_spin_started)
 	%SlotMachine.spin_finished.connect(_on_spin_finished)
 	for note in graph.notes():
@@ -70,8 +71,14 @@ func _on_spin_finished(results: Array[StringName]) -> void:
 		level_coins += payout.coins + GameState.coin_income_bonus()
 	_refresh_hud()
 	var graph := %LevelGraph as LevelGraph
+	graph.launch_firewall_attacks()
 	graph.apply_resources(payout.resources)
 	%SlotMachine.set_can_spin(spins_remaining > 0)
+
+
+func _on_coin_stolen(amount: int) -> void:
+	level_coins = maxi(level_coins - amount, 0)
+	_refresh_hud()
 
 
 func _on_prestige_earned(amount: int, from_global_position: Vector2) -> void:
@@ -152,7 +159,7 @@ func _on_note_help_exited(note: LevelNote) -> void:
 
 func _show_help_tooltip(note: LevelNote) -> void:
 	var tooltip := %HelpTooltip as PanelContainer
-	%HelpTooltipText.text = note.help_text()
+	%HelpTooltipText.text = note.full_help_text()
 	tooltip.reset_size()
 	tooltip.visible = true
 	_follow_mouse_with_tooltip()

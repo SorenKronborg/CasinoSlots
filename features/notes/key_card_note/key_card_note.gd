@@ -1,44 +1,42 @@
-class_name CoinNote
+class_name KeyCardNote
 extends LevelNote
 
-@export var coin_capacity: int = 10
+@export var key_id := "A"
+@export var coin_capacity := 10
 
-var collected: int = 0
+var collected := 0
 var _displayed_remaining := -1
 
 
 func _ready() -> void:
 	text = ""
+	%KeyLetter.text = key_id
 	_refresh_deposit()
 
 
-func help_text() -> String:
-	return tr("Coin Note Help") % coin_capacity
-
-
-func is_full() -> bool:
+func is_captured() -> bool:
 	return coin_capacity > 0 and collected >= coin_capacity
 
 
-func is_captured() -> bool:
-	return is_full()
-
-
-func resource_multiplier() -> int:
-	return 2 if is_captured() else 1
+func granted_key() -> String:
+	return key_id if is_captured() else ""
 
 
 func deposit(available: int) -> Vector2i:
-	if disabled or is_full() or available <= 0 or coin_capacity <= 0:
+	if disabled or is_captured() or available <= 0 or coin_capacity <= 0:
 		return Vector2i.ZERO
 	collected += 1
 	var prestige := 0
-	if is_full():
+	if is_captured():
 		prestige = 1
 		show_completed()
 		captured.emit(self)
 	_refresh_deposit()
 	return Vector2i(1, prestige)
+
+
+func help_text() -> String:
+	return tr("Key Card Note Help") % [coin_capacity, key_id]
 
 
 func _refresh_deposit() -> void:

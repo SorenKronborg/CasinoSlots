@@ -5,6 +5,8 @@ extends Node2D
 @export var from_path: NodePath
 @export var to_path: NodePath
 
+var _frontier_lock: LevelGraphLock
+
 
 func _ready() -> void:
 	refresh()
@@ -46,6 +48,16 @@ func set_resource_icons(icons: Dictionary) -> void:
 		lock.set_resource_icon(texture as Texture2D)
 
 
+func set_graph_visible(show_link: bool, frontier_lock: LevelGraphLock = null) -> void:
+	visible = show_link
+	_frontier_lock = frontier_lock
+	if not show_link:
+		return
+	for lock in locks():
+		lock.visible = lock == frontier_lock and (lock.is_locked() or lock.is_unlocking())
+	refresh()
+
+
 func refresh() -> void:
 	var from_note := _note_at(from_path)
 	var to_note := _note_at(to_path)
@@ -56,12 +68,15 @@ func refresh() -> void:
 	var line := get_node_or_null("Line") as Line2D
 	if line == null:
 		return
-	line.points = PackedVector2Array([start, end])
 	var placed := locks()
 	var count := placed.size()
 	for i in count:
 		var t := float(i + 1) / float(count + 1)
 		placed[i].position = start.lerp(end, t)
+	var visible_end := end
+	if not Engine.is_editor_hint() and _frontier_lock != null:
+		visible_end = _frontier_lock.position
+	line.points = PackedVector2Array([start, visible_end])
 
 
 func _note_id(path: NodePath) -> String:

@@ -15,11 +15,13 @@ const FADE_SCALE := 0.7
 
 @export var unlock_resource: StringName = &""
 @export var unlock_cost: int = 10
+@export var required_key: String = ""
 
 var collected: int = 0
 
 var _displayed_remaining := -1
 var _unlocking := false
+var _key_available := true
 
 @onready var _sprite: Sprite2D = $Lock
 @onready var _requirement: Control = $Requirement
@@ -27,12 +29,13 @@ var _unlocking := false
 
 
 func _ready() -> void:
+	set_key_access(required_key == "")
 	visible = is_locked()
 	_refresh_requirement()
 
 
 func is_locked() -> bool:
-	return collected < unlock_cost
+	return not _key_available or collected < unlock_cost
 
 
 func is_unlocking() -> bool:
@@ -44,8 +47,19 @@ func set_resource_icon(texture: Texture2D) -> void:
 	%Icon.visible = texture != null
 
 
+func set_key_access(available: bool) -> void:
+	_key_available = available or required_key == ""
+	var badge := get_node_or_null("KeyBadge") as KeyBadge
+	if badge != null:
+		badge.show_key(required_key, _key_available)
+
+
+func can_accept(resource: StringName) -> bool:
+	return _key_available and is_locked() and resource == unlock_resource
+
+
 func contribute(resource: StringName, amount: int) -> int:
-	if not is_locked() or amount <= 0 or resource != unlock_resource:
+	if not can_accept(resource) or amount <= 0:
 		return amount
 	var needed := maxi(unlock_cost - collected, 0)
 	var used := mini(amount, needed)

@@ -1,39 +1,41 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://features/levels/base_level.tscn" id="1_base"]
 [ext_resource type="PackedScene" path="res://features/notes/coin_note/coin_note.tscn" id="2_coin"]
 [ext_resource type="PackedScene" path="res://features/notes/silo_note/silo_note.tscn" id="3_silo"]
 [ext_resource type="PackedScene" path="res://features/graph/level_graph_link.tscn" id="4_link"]
 [ext_resource type="PackedScene" path="res://features/graph/level_graph_lock.tscn" id="5_lock"]
+[ext_resource type="PackedScene" path="res://features/notes/key_card_note/key_card_note.tscn" id="6_key"]
+[ext_resource type="PackedScene" path="res://features/graph/firewall/level_graph_firewall.tscn" id="7_firewall"]
 
 [node name="BaseLevel" instance=ExtResource("1_base")]
 
-[node name="left1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+[node name="left1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("6_key")]
 layout_mode = 0
 offset_left = 384.0
 offset_top = 524.0
 offset_right = 432.0
 offset_bottom = 572.0
 coin_capacity = 10
-prestige_reward = 1
+key_id = "A"
 
-[node name="mid1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+[node name="mid1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("6_key")]
 layout_mode = 0
 offset_left = 696.0
 offset_top = 524.0
 offset_right = 744.0
 offset_bottom = 572.0
 coin_capacity = 10
-prestige_reward = 1
+key_id = "B"
 
-[node name="right1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
+[node name="right1" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("6_key")]
 layout_mode = 0
 offset_left = 1008.0
 offset_top = 524.0
 offset_right = 1056.0
 offset_bottom = 572.0
 coin_capacity = 10
-prestige_reward = 1
+key_id = "C"
 
 [node name="left2" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
@@ -42,7 +44,7 @@ offset_top = 344.0
 offset_right = 432.0
 offset_bottom = 392.0
 coin_capacity = 20
-prestige_reward = 2
+required_key = "A"
 
 [node name="mid2" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
@@ -51,7 +53,7 @@ offset_top = 344.0
 offset_right = 744.0
 offset_bottom = 392.0
 coin_capacity = 20
-prestige_reward = 2
+required_key = "B"
 
 [node name="right2" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
@@ -60,7 +62,11 @@ offset_top = 344.0
 offset_right = 1056.0
 offset_bottom = 392.0
 coin_capacity = 20
-prestige_reward = 2
+required_key = "C"
+
+[node name="Firewall" parent="Layout/TopField/LevelGraph/Nodes/mid2" instance=ExtResource("7_firewall")]
+vulnerable_resource = &"diamond"
+required_amount = 3
 
 [node name="left3" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
@@ -69,7 +75,6 @@ offset_top = 144.0
 offset_right = 432.0
 offset_bottom = 192.0
 coin_capacity = 30
-prestige_reward = 3
 
 [node name="mid3" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("2_coin")]
 layout_mode = 0
@@ -78,7 +83,6 @@ offset_top = 144.0
 offset_right = 744.0
 offset_bottom = 192.0
 coin_capacity = 30
-prestige_reward = 3
 
 [node name="right3" parent="Layout/TopField/LevelGraph/Nodes" instance=ExtResource("3_silo")]
 layout_mode = 0
@@ -87,7 +91,6 @@ offset_top = 144.0
 offset_right = 1056.0
 offset_bottom = 192.0
 resource_capacity = 30
-prestige_reward = 3
 
 [node name="LinkSpinLeft" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("%SlotMachine/Spin")
@@ -95,7 +98,7 @@ to_path = NodePath("../../Nodes/left1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinLeft" instance=ExtResource("5_lock")]
 unlock_resource = &"cherry"
-unlock_cost = 10
+unlock_cost = 3
 
 [node name="LinkSpinMid" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("%SlotMachine/Spin")
@@ -103,7 +106,7 @@ to_path = NodePath("../../Nodes/mid1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinMid" instance=ExtResource("5_lock")]
 unlock_resource = &"bell"
-unlock_cost = 10
+unlock_cost = 3
 
 [node name="LinkSpinRight" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("%SlotMachine/Spin")
@@ -111,7 +114,7 @@ to_path = NodePath("../../Nodes/right1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinRight" instance=ExtResource("5_lock")]
 unlock_resource = &"seven"
-unlock_cost = 10
+unlock_cost = 3
 
 [node name="LinkLeft2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("../../Nodes/left1")
@@ -119,7 +122,7 @@ to_path = NodePath("../../Nodes/left2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkLeft2" instance=ExtResource("5_lock")]
 unlock_resource = &"watermelon"
-unlock_cost = 20
+unlock_cost = 3
 
 [node name="LinkMid2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("../../Nodes/mid1")
@@ -127,7 +130,7 @@ to_path = NodePath("../../Nodes/mid2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkMid2" instance=ExtResource("5_lock")]
 unlock_resource = &"diamond"
-unlock_cost = 20
+unlock_cost = 3
 
 [node name="LinkRight2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("../../Nodes/right1")
@@ -135,7 +138,7 @@ to_path = NodePath("../../Nodes/right2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkRight2" instance=ExtResource("5_lock")]
 unlock_resource = &"cherry"
-unlock_cost = 20
+unlock_cost = 3
 
 [node name="LinkLeft3" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("../../Nodes/left2")
@@ -143,7 +146,8 @@ to_path = NodePath("../../Nodes/left3")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkLeft3" instance=ExtResource("5_lock")]
 unlock_resource = &"bell"
-unlock_cost = 30
+unlock_cost = 3
+required_key = "A"
 
 [node name="LinkMid3" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("../../Nodes/mid2")
@@ -151,7 +155,8 @@ to_path = NodePath("../../Nodes/mid3")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkMid3" instance=ExtResource("5_lock")]
 unlock_resource = &"seven"
-unlock_cost = 30
+unlock_cost = 3
+required_key = "B"
 
 [node name="LinkRight3" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
 from_path = NodePath("../../Nodes/right2")
@@ -159,4 +164,5 @@ to_path = NodePath("../../Nodes/right3")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkRight3" instance=ExtResource("5_lock")]
 unlock_resource = &"watermelon"
-unlock_cost = 30
+unlock_cost = 3
+required_key = "C"

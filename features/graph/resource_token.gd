@@ -2,7 +2,9 @@ class_name ResourceToken
 extends Sprite2D
 
 signal arrived
+signal cancelled
 
+var resource_id: StringName = &""
 var _points: PackedVector2Array = PackedVector2Array()
 var _speed := 220.0
 var _traveled := 0.0
@@ -14,9 +16,11 @@ func begin(
 		speed: float,
 		icon: Texture2D,
 		token_size: float,
-		delay: float
+		delay: float,
+		resource: StringName = &""
 ) -> void:
 	_points = points
+	resource_id = resource
 	_speed = maxf(speed, 1.0)
 	texture = icon
 	centered = true
@@ -38,6 +42,18 @@ func begin(
 		return
 	position = _points[0]
 	set_process(true)
+
+
+func cancel() -> void:
+	if not is_inside_tree():
+		return
+	set_process(false)
+	cancelled.emit()
+	queue_free()
+
+
+func is_travelling() -> bool:
+	return visible and is_processing()
 
 
 func _process(delta: float) -> void:
