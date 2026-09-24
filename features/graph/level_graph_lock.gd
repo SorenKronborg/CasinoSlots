@@ -12,6 +12,7 @@ const HOLD_SECONDS := 0.3
 const FADE_SECONDS := 1.15
 const FADE_RISE := 26.0
 const FADE_SCALE := 0.7
+const REFUSED_TINT := Color(1, 0.3, 0.28, 1)
 
 @export var unlock_resource: StringName = &""
 @export var unlock_cost: int = 10
@@ -22,13 +23,16 @@ var collected: int = 0
 var _displayed_remaining := -1
 var _unlocking := false
 var _key_available := true
+var _refused := false
 
 @onready var _sprite: Sprite2D = $Lock
 @onready var _requirement: Control = $Requirement
+@onready var _refuse_toggle: Button = $RefuseToggle
 @onready var _closed_scale: Vector2 = _sprite.scale
 
 
 func _ready() -> void:
+	_refuse_toggle.pressed.connect(_on_refuse_toggle_pressed)
 	set_key_access(required_key == "")
 	visible = is_locked()
 	_refresh_requirement()
@@ -36,6 +40,17 @@ func _ready() -> void:
 
 func is_locked() -> bool:
 	return not _key_available or collected < unlock_cost
+
+
+func is_refused() -> bool:
+	return _refused
+
+
+func set_refused(refused: bool) -> void:
+	if _refused == refused:
+		return
+	_refused = refused
+	_refresh_refused_tint()
 
 
 func is_unlocking() -> bool:
@@ -55,7 +70,9 @@ func set_key_access(available: bool) -> void:
 
 
 func can_accept(resource: StringName) -> bool:
-	return _key_available and is_locked() and resource == unlock_resource
+	if _refused or not _key_available or not is_locked():
+		return false
+	return resource == unlock_resource
 
 
 func contribute(resource: StringName, amount: int) -> int:
@@ -68,6 +85,18 @@ func contribute(resource: StringName, amount: int) -> int:
 	if not is_locked():
 		_play_unlock()
 	return amount - used
+
+
+func _on_refuse_toggle_pressed() -> void:
+	if _unlocking:
+		return
+	set_refused(not _refused)
+
+
+func _refresh_refused_tint() -> void:
+	var tint := REFUSED_TINT if _refused else Color.WHITE
+	_sprite.modulate = tint
+	_requirement.modulate = tint
 
 
 func _refresh_requirement() -> void:

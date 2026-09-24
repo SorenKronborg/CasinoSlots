@@ -105,7 +105,7 @@ func launch_firewall_attacks() -> void:
 		var note := firewall.host_note()
 		if note == null or not note.visible:
 			continue
-		var path := _path_to_note(note)
+		var path := _path_to_note(note, {})
 		path.reverse()
 		for index in FIREWALL_ATTACK_COUNT:
 			_spawn_firewall_attack(
@@ -188,7 +188,7 @@ func _plan_into_firewall(
 	var note := firewall.host_note()
 	if note == null:
 		return 0
-	var segments := _segments_to_note(note)
+	var segments := _segments_to_note(note, planned)
 	var multiplier := _segment_multiplier(segments)
 	var free_space := firewall.remaining() - _incoming(firewall, planned)
 	var used := mini(remaining, ceili(float(free_space) / float(multiplier)))
@@ -243,7 +243,7 @@ func _front_lock(link: LevelGraphLink, planned: Dictionary) -> LevelGraphLock:
 
 func _frontier_lock(link: LevelGraphLink) -> LevelGraphLock:
 	for lock in link.locks():
-		if lock.is_locked() or lock.is_unlocking():
+		if lock.is_locked():
 			return lock
 	return null
 
@@ -257,7 +257,7 @@ func _plan_into_lock(
 ) -> int:
 	var extra := _incoming(lock, planned)
 	var free_space := lock.unlock_cost - lock.collected - extra
-	var segments := _segments_to_lock(lock)
+	var segments := _segments_to_lock(lock, planned)
 	var multiplier := _segment_multiplier(segments)
 	var used := mini(remaining, ceili(float(free_space) / float(multiplier)))
 	_add_deliveries(resource, lock, used, used * multiplier, segments, planned, deliveries)
@@ -276,7 +276,7 @@ func _plan_into_silos(
 			return
 		if not bool(reachable.get(note.note_id(), false)):
 			continue
-		var segments := _segments_to_note(note)
+		var segments := _segments_to_note(note, planned)
 		var multiplier := _segment_multiplier(segments)
 		var used := remaining
 		if not note.accepts_repeating_resources():
@@ -414,45 +414,31 @@ func _remove_in_flight(target: Node, amount: int) -> void:
 		_in_flight.erase(target)
 
 
-func _path_to_lock(lock: LevelGraphLock) -> PackedVector2Array:
-	var owner_link := lock.get_parent() as LevelGraphLink
-	if owner_link == null:
-		return PackedVector2Array()
-	var chain := _links_to_owner(_flow_start_id(), owner_link)
-	var points := PackedVector2Array()
-	for i in chain.size():
-		var link_points := _link_points_in_graph(chain[i])
-		if i == chain.size() - 1:
-			link_points = _polyline_until(link_points, _to_graph_local(lock.global_position))
-		_append_polyline(points, link_points)
-	return points
-
-
-func _path_to_note(note: LevelNote) -> PackedVector2Array:
-	var final_link := _link_into(note.note_id())
+func _path_to_note(note: LevelNote, planned: Dictionary) -> PackedVector2Array:
+	var final_link := _link_into(note.note_id(), planned)
 	if final_link == null:
 		return PackedVector2Array()
 	var points := PackedVector2Array()
-	for link in _links_to_owner(_flow_start_id(), final_link):
+	for link in _links_to_owner(_flow_start_id(), final_link, planned):
 		_append_polyline(points, _link_points_in_graph(link))
 	return points
 
 
-func _segments_to_lock(lock: LevelGraphLock) -> Array[PackedVector2Array]:
+func _segments_to_lock(lock: LevelGraphLock, planned: Dictionary) -> Array[PackedVector2Array]:
 	var owner_link := lock.get_parent() as LevelGraphLink
 	if owner_link == null:
 		return []
-	var chain := _links_to_owner(_flow_start_id(), owner_link)
+	var chain := _links_to_owner(_flow_start_id(), owner_link, planned)
 	var final_points := _link_points_in_graph(owner_link)
 	final_points = _polyline_until(final_points, _to_graph_local(lock.global_position))
 	return _segments_for_chain(chain, final_points)
 
 
-func _segments_to_note(note: LevelNote) -> Array[PackedVector2Array]:
-	var final_link := _link_into(note.note_id())
+func _segments_to_note(note: LevelNote, planned: Dictionary) -> Array[PackedVector2Array]:
+	var final_link := _link_into(note.note_id(), planned)
 	if final_link == null:
 		return []
-	var chain := _links_to_owner(_flow_start_id(), final_link)
+	var chain := _links_to_owner(_flow_start_id(), final_link, planned)
 	return _segments_for_chain(chain, _link_points_in_graph(final_link))
 
 
@@ -485,11 +471,20 @@ func _segment_multiplier(segments: Array[PackedVector2Array]) -> int:
 	return multiplier
 
 
-func _link_into(node_id: String) -> LevelGraphLink:
+func _link_into(node_id: String, planned: Dictionary) -> LevelGraphLink:
+	var closed_fallback: LevelGraphLink = null
 	for link in _graph_links:
-		if link.to_id() == node_id:
+		if link.to_id() != node_id:
+			continue
+		if _is_open(link, planned):
 			return link
-	return null
+		if closed_fallback == null:
+			closed_fallback = link
+	return closed_fallback
+
+
+func _is_open(link: LevelGraphLink, planned: Dictionary) -> bool:
+	return _front_lock(link, planned) == null
 
 
 func _flow_start_id() -> String:
@@ -499,7 +494,11 @@ func _flow_start_id() -> String:
 	return ""
 
 
-func _links_to_owner(start_id: String, owner_link: LevelGraphLink) -> Array[LevelGraphLink]:
+func _links_to_owner(
+		start_id: String,
+		owner_link: LevelGraphLink,
+		planned: Dictionary
+) -> Array[LevelGraphLink]:
 	if start_id == "" or start_id == owner_link.from_id():
 		return [owner_link]
 	var visited: Dictionary = {start_id: true}
@@ -510,7 +509,7 @@ func _links_to_owner(start_id: String, owner_link: LevelGraphLink) -> Array[Leve
 		if node_id == owner_link.from_id():
 			break
 		for link in _graph_links:
-			if link.from_id() != node_id:
+			if link.from_id() != node_id or not _is_open(link, planned):
 				continue
 			var to_id := link.to_id()
 			if to_id == "" or visited.get(to_id, false):

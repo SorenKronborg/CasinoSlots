@@ -54,7 +54,7 @@ func set_graph_visible(show_link: bool, frontier_lock: LevelGraphLock = null) ->
 	if not show_link:
 		return
 	for lock in locks():
-		lock.visible = lock == frontier_lock and (lock.is_locked() or lock.is_unlocking())
+		lock.visible = lock == frontier_lock or lock.is_unlocking()
 	refresh()
 
 

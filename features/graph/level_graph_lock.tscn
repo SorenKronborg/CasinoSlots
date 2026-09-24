@@ -1,11 +1,34 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://features/graph/level_graph_lock.gd" id="1_lock"]
 [ext_resource type="Texture2D" path="res://assets/icons/lock.svg" id="2_lock"]
 [ext_resource type="PackedScene" path="res://features/ui/key_badge.tscn" id="3_badge"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_invisible"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(1, 1, 1, 0.12)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="LevelGraphLock" type="Node2D"]
 script = ExtResource("1_lock")
+
+[node name="RefuseToggle" type="Button" parent="."]
+offset_left = -18.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 18.0
+focus_mode = 0
+tooltip_text = "Refuse Lock Hint"
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_invisible")
 
 [node name="Lock" type="Sprite2D" parent="."]
 scale = Vector2(0.55, 0.55)

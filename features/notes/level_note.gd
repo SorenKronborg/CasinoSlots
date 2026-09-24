@@ -20,10 +20,18 @@ func set_reachable(reachable: bool) -> void:
 
 func set_key_access(available: bool) -> void:
 	_key_available = available or required_key == ""
-	var badge := get_node_or_null("KeyBadge") as KeyBadge
-	if badge != null:
-		badge.show_key(required_key, _key_available)
+	_refresh_key_badge()
 	_refresh_access()
+
+
+func _refresh_key_badge() -> void:
+	var badge := get_node_or_null("KeyBadge") as KeyBadge
+	if badge == null:
+		return
+	if is_deposit_blocked():
+		badge.visible = false
+		return
+	badge.show_key(required_key, _key_available)
 
 
 func _refresh_access() -> void:
@@ -91,9 +99,9 @@ func help_text() -> String:
 
 func full_help_text() -> String:
 	var lines: Array[String] = [help_text()]
-	if required_key != "":
-		lines.append(tr("Key Gate Help") % required_key)
 	var attached := firewall()
 	if attached != null and attached.is_active():
 		lines.append(attached.help_text())
+	elif required_key != "":
+		lines.append(tr("Key Gate Help") % required_key)
 	return "\n".join(lines)
