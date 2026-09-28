@@ -1,13 +1,15 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
+const BASE_SILO_CAPACITY := 5
 const DEFAULT_RESOURCES := {
 	"prestige": 5,
 }
 
 var resources: Dictionary = DEFAULT_RESOURCES.duplicate()
 var upgrade_ranks: Dictionary = {}
+var silo_amounts: Dictionary = {}
 
 
 func has_save() -> bool:
@@ -17,6 +19,7 @@ func has_save() -> bool:
 func reset() -> void:
 	resources = DEFAULT_RESOURCES.duplicate()
 	upgrade_ranks.clear()
+	silo_amounts.clear()
 
 
 func prestige() -> int:
@@ -45,6 +48,39 @@ func extra_spin_bonus() -> int:
 
 func has_extra_wheel() -> bool:
 	return rank_of(UpgradeCatalog.EXTRA_WHEEL) > 0
+
+
+func has_resource_silos() -> bool:
+	return rank_of(UpgradeCatalog.RESOURCE_SILO) > 0
+
+
+func silo_capacity(resource_id: StringName) -> int:
+	if not has_resource_silos():
+		return 0
+	return BASE_SILO_CAPACITY + rank_of(UpgradeCatalog.silo_capacity_id(resource_id))
+
+
+func silo_stored(resource_id: StringName) -> int:
+	return int(silo_amounts.get(String(resource_id), 0))
+
+
+func store_silo_resources(resource_id: StringName, amount: int) -> int:
+	if amount <= 0:
+		return 0
+	var room := silo_capacity(resource_id) - silo_stored(resource_id)
+	var accepted := mini(amount, maxi(room, 0))
+	if accepted <= 0:
+		return 0
+	silo_amounts[String(resource_id)] = silo_stored(resource_id) + accepted
+	return accepted
+
+
+func withdraw_silo_resource(resource_id: StringName) -> bool:
+	var stored := silo_stored(resource_id)
+	if stored <= 0:
+		return false
+	silo_amounts[String(resource_id)] = stored - 1
+	return true
 
 
 func is_upgrade_unlocked(upgrade_id: StringName) -> bool:
@@ -104,6 +140,7 @@ func _to_save_dict() -> Dictionary:
 		"version": SAVE_VERSION,
 		"resources": resources.duplicate(),
 		"upgrade_ranks": upgrade_ranks.duplicate(),
+		"silo_amounts": silo_amounts.duplicate(),
 	}
 
 
@@ -122,4 +159,9 @@ func _apply_save_dict(data: Dictionary) -> Error:
 	if saved_ranks is Dictionary:
 		for upgrade_id in saved_ranks:
 			upgrade_ranks[str(upgrade_id)] = int(saved_ranks[upgrade_id])
+	silo_amounts.clear()
+	var saved_silos: Variant = data.get("silo_amounts")
+	if saved_silos is Dictionary:
+		for resource_id in saved_silos:
+			silo_amounts[str(resource_id)] = maxi(int(saved_silos[resource_id]), 0)
 	return OK

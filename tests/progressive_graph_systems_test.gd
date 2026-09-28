@@ -20,6 +20,8 @@ func _run() -> void:
 	await _test_key_card_and_gate()
 	await _test_firewall_damage()
 	await _test_initial_frontier_visibility()
+	await _test_unused_resources_skip_locked_graph()
+	_test_resource_silo_storage()
 	if _failures == 0:
 		print("Progressive graph systems: all checks passed")
 	quit(_failures)
@@ -99,6 +101,42 @@ func _test_initial_frontier_visibility() -> void:
 	_check(edges.get_node("LinkSpinLeft").visible, "Edge leading to initial lock should show")
 	level.queue_free()
 	await process_frame
+
+
+func _test_unused_resources_skip_locked_graph() -> void:
+	var level := LEVEL_ONE_SCENE.instantiate()
+	get_root().add_child(level)
+	await process_frame
+	await process_frame
+	var graph := level.get_node("Layout/TopField/LevelGraph") as LevelGraph
+	var unused := graph.apply_resources({&"cherry": 8})
+	_check(int(unused.get(&"cherry", 0)) == 3, "Resources the graph cannot take should be returned")
+	level.queue_free()
+	await process_frame
+
+
+func _test_resource_silo_storage() -> void:
+	GameState.reset()
+	_check(GameState.store_silo_resources(&"cherry", 3) == 0, "Silos should reject resources before the upgrade")
+	_check(GameState.try_purchase(UpgradeCatalog.RESOURCE_SILO), "Resource Silo should cost 5 prestige")
+	_check(GameState.silo_capacity(&"cherry") == 5, "Each silo should start with room for 5")
+	_check(GameState.store_silo_resources(&"cherry", 4) == 4, "Silo should store leftover resources")
+	_check(GameState.store_silo_resources(&"cherry", 3) == 1, "A full silo should discard overflow")
+	_check(GameState.silo_stored(&"cherry") == 5, "Silo should stay at capacity")
+	_check(GameState.withdraw_silo_resource(&"cherry"), "Silo should give back one stored resource")
+	_check(GameState.silo_stored(&"cherry") == 4, "Withdraw should leave 4 stored")
+	_check(not GameState.withdraw_silo_resource(&"bell"), "Empty silo should refuse a withdraw")
+	GameState.resources["prestige"] = 6
+	_check(GameState.try_purchase(UpgradeCatalog.silo_capacity_id(&"cherry")), "Cherry silo upgrade should be available")
+	_check(GameState.try_purchase(UpgradeCatalog.silo_capacity_id(&"cherry")), "Cherry silo upgrade should stack")
+	_check(GameState.silo_capacity(&"cherry") == 7, "Each rank should add 1 cherry storage")
+	_check(GameState.silo_capacity(&"bell") == 5, "Bell storage should stay at the base amount")
+	var saved := GameState._to_save_dict()
+	GameState.reset()
+	_check(GameState._apply_save_dict(saved) == OK, "Silo save should load")
+	_check(GameState.silo_stored(&"cherry") == 4, "Save should keep stored resources")
+	_check(GameState.silo_capacity(&"cherry") == 7, "Save should keep silo capacity upgrades")
+	GameState.reset()
 
 
 func _check(condition: bool, message: String) -> void:

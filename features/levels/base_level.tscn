@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://features/levels/base_level.gd" id="1_base"]
 [ext_resource type="Script" path="res://features/graph/level_graph.gd" id="2_graph"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" path="res://assets/icons/heart.png" id="5_heart"]
 [ext_resource type="AudioStream" path="res://assets/audio/coin.wav" id="6_coin"]
 [ext_resource type="Texture2D" path="res://assets/background/background3.jpg" id="7_bg"]
+[ext_resource type="PackedScene" path="res://features/silos/resource_silo_bar.tscn" id="8_silos"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0, 0, 0, 1)
@@ -185,6 +186,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="ResourceSilos" parent="Layout/BottomField" instance=ExtResource("8_silos")]
+unique_name_in_owner = true
+z_index = 2
+layout_mode = 1
+anchor_top = 0.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 360.0
+offset_bottom = -8.0
+grow_vertical = 2
+
 [node name="SpinsBadge" type="HBoxContainer" parent="Layout/BottomField"]
 layout_mode = 1
 anchor_left = 0.5
@@ -275,6 +288,10 @@ text = "0"
 horizontal_alignment = 2
 
 [node name="PrestigeFlights" type="Node2D" parent="."]
+unique_name_in_owner = true
+z_index = 40
+
+[node name="SiloFlights" type="Node2D" parent="."]
 unique_name_in_owner = true
 z_index = 40
 

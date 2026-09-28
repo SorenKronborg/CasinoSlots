@@ -7,6 +7,7 @@ var description: String = ""
 var costs: Array[int] = []
 var prerequisite_id: StringName = &""
 var prerequisite_rank := 0
+var resource_id: StringName = &""
 var graph_position := Vector2.ZERO
 
 

@@ -10,9 +10,10 @@ static func play(control: Control) -> void:
 	if control == null or not control.is_inside_tree():
 		return
 	control.pivot_offset = control.size * 0.5
-	var existing: Variant = control.get_meta("counter_pulse_tween", null)
-	if existing is Tween:
-		(existing as Tween).kill()
+	if control.has_meta("counter_pulse_tween"):
+		var existing: Variant = control.get_meta("counter_pulse_tween")
+		if existing is Tween:
+			(existing as Tween).kill()
 	control.scale = Vector2.ONE
 	var tween := control.create_tween()
 	tween.set_trans(Tween.TRANS_SINE)

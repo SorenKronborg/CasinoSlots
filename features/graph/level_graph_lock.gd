@@ -2,6 +2,7 @@ class_name LevelGraphLock
 extends Node2D
 
 signal unlock_finished
+signal deposit_requested
 
 const FLASH_COLOR := Color(1, 0.97, 0.6, 1)
 const POP_SCALE := 1.5
@@ -33,6 +34,7 @@ var _refused := false
 
 func _ready() -> void:
 	_refuse_toggle.pressed.connect(_on_refuse_toggle_pressed)
+	(%Icon as BaseButton).pressed.connect(_on_resource_icon_pressed)
 	set_key_access(required_key == "")
 	visible = is_locked()
 	_refresh_requirement()
@@ -58,8 +60,9 @@ func is_unlocking() -> bool:
 
 
 func set_resource_icon(texture: Texture2D) -> void:
-	%Icon.texture = texture
-	%Icon.visible = texture != null
+	var icon := %Icon as TextureButton
+	icon.texture_normal = texture
+	icon.visible = texture != null
 
 
 func set_key_access(available: bool) -> void:
@@ -85,6 +88,12 @@ func contribute(resource: StringName, amount: int) -> int:
 	if not is_locked():
 		_play_unlock()
 	return amount - used
+
+
+func _on_resource_icon_pressed() -> void:
+	if _unlocking or not can_accept(unlock_resource):
+		return
+	deposit_requested.emit()
 
 
 func _on_refuse_toggle_pressed() -> void:

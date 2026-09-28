@@ -4,6 +4,7 @@ extends Control
 signal node_clicked(node_id: String)
 signal prestige_earned(amount: int, from_global_position: Vector2)
 signal coin_stolen(amount: int)
+signal silo_deposit_requested(lock: LevelGraphLock)
 
 const TOKEN_SCENE := preload("res://features/graph/resource_token.tscn")
 const FIREWALL_ATTACK_ICON := preload("res://assets/icons/firewall_attack.svg")
@@ -11,6 +12,7 @@ const FIREWALL_ATTACK_COUNT := 3
 const FIREWALL_ATTACK_SIZE := 22.0
 const FIREWALL_ATTACK_SPEED_SCALE := 0.85
 const COLLISION_DISTANCE := 18.0
+const DUPLICATE_OFFSET_RATIO := 0.2
 
 @export var token_size := 28.0
 @export var token_speed := 275.0
@@ -73,10 +75,11 @@ func _note_center_global(note: LevelNote) -> Vector2:
 	return note.get_global_rect().get_center()
 
 
-func apply_resources(gained: Dictionary) -> void:
+func apply_resources(gained: Dictionary) -> Dictionary:
 	_refresh_links()
 	var deliveries: Array[Delivery] = []
 	var planned: Dictionary = {}
+	var unused: Dictionary = {}
 	for resource in gained:
 		var resource_id := resource as StringName
 		var remaining := int(gained[resource])
@@ -92,10 +95,13 @@ func apply_resources(gained: Dictionary) -> void:
 			if lock == null:
 				break
 			remaining -= _plan_into_lock(lock, resource_id, remaining, planned, deliveries)
-		_plan_into_silos(resource_id, remaining, planned, deliveries)
+		remaining = _plan_into_silos(resource_id, remaining, planned, deliveries)
+		if remaining > 0:
+			unused[resource_id] = remaining
 	for target in planned:
 		_in_flight[target] = int(_in_flight.get(target, 0)) + int(planned[target])
 	_play_deliveries(deliveries)
+	return unused
 
 
 func launch_firewall_attacks() -> void:
@@ -217,10 +223,39 @@ func _next_lock_for(resource: StringName, planned: Dictionary) -> LevelGraphLock
 	return null
 
 
+func begin_silo_deposit(lock: LevelGraphLock) -> bool:
+	if lock == null or not lock.can_accept(lock.unlock_resource):
+		return false
+	if lock.collected + _incoming(lock, {}) >= lock.unlock_cost:
+		return false
+	_in_flight[lock] = int(_in_flight.get(lock, 0)) + 1
+	return true
+
+
+func finish_silo_deposit(lock: LevelGraphLock) -> bool:
+	if is_instance_valid(lock):
+		_remove_in_flight(lock, 1)
+	if not is_instance_valid(lock) or not lock.can_accept(lock.unlock_resource):
+		return false
+	var unused := lock.contribute(lock.unlock_resource, 1)
+	_refresh_graph_state()
+	return unused == 0
+
+
+func cancel_silo_deposit(lock: LevelGraphLock) -> void:
+	if is_instance_valid(lock):
+		_remove_in_flight(lock, 1)
+
+
 func _connect_locks() -> void:
 	for link in _links:
 		for lock in link.locks():
 			lock.unlock_finished.connect(_on_lock_finished.bind(lock))
+			lock.deposit_requested.connect(_on_deposit_requested.bind(lock))
+
+
+func _on_deposit_requested(lock: LevelGraphLock) -> void:
+	silo_deposit_requested.emit(lock)
 
 
 func _is_opening(link: LevelGraphLink) -> bool:
@@ -269,11 +304,11 @@ func _plan_into_silos(
 		remaining: int,
 		planned: Dictionary,
 		deliveries: Array[Delivery]
-) -> void:
+) -> int:
 	var reachable := _reachable_ids(planned)
 	for note in _note_order:
 		if remaining <= 0:
-			return
+			return 0
 		if not bool(reachable.get(note.note_id(), false)):
 			continue
 		var segments := _segments_to_note(note, planned)
@@ -294,6 +329,7 @@ func _plan_into_silos(
 				deliveries
 		)
 		remaining -= used
+	return remaining
 
 
 func _add_deliveries(
@@ -380,14 +416,68 @@ func _on_delivery_stage_arrived(delivery: Delivery) -> void:
 	if delivery.stage >= delivery.segments.size() - 1:
 		_on_token_arrived(delivery.target, delivery.resource)
 		return
-	for child_index in 2:
-		var child := Delivery.new()
-		child.resource = delivery.resource
-		child.target = delivery.target
-		child.segments = delivery.segments
-		child.stage = delivery.stage + 1
-		var delay := float(child_index) * token_spacing / maxf(token_speed, 1.0)
-		_spawn_delivery_stage(child, delay)
+	var next_stage := delivery.stage + 1
+	var duplicate_shift := _duplicate_shift(delivery.segments[next_stage])
+	var duplicate_delay := token_spacing / maxf(token_speed, 1.0)
+	_spawn_split_copy(delivery, next_stage, 0.0, Vector2.ZERO)
+	_spawn_split_copy(delivery, next_stage, duplicate_delay, duplicate_shift)
+
+
+func _spawn_split_copy(
+		delivery: Delivery,
+		stage: int,
+		delay: float,
+		shift: Vector2
+) -> void:
+	var child := Delivery.new()
+	child.resource = delivery.resource
+	child.target = delivery.target
+	child.stage = stage
+	child.segments = delivery.segments
+	if shift != Vector2.ZERO:
+		child.segments = _shift_segments_from(delivery.segments, stage, shift)
+	_spawn_delivery_stage(child, delay)
+
+
+func _duplicate_shift(points: PackedVector2Array) -> Vector2:
+	return _outgoing_direction(points).orthogonal() * token_size * DUPLICATE_OFFSET_RATIO
+
+
+func _outgoing_direction(points: PackedVector2Array) -> Vector2:
+	var origin := Vector2.ZERO
+	var has_origin := false
+	for point in points:
+		if not has_origin:
+			origin = point
+			has_origin = true
+			continue
+		var step := point - origin
+		if step.length_squared() > 0.0001:
+			return step.normalized()
+	return Vector2.RIGHT
+
+
+func _shift_segments_from(
+		segments: Array[PackedVector2Array],
+		from_stage: int,
+		shift: Vector2
+) -> Array[PackedVector2Array]:
+	var shifted: Array[PackedVector2Array] = []
+	var stage := 0
+	for points in segments:
+		if stage < from_stage:
+			shifted.append(points)
+		else:
+			shifted.append(_shift_points(points, shift))
+		stage += 1
+	return shifted
+
+
+func _shift_points(points: PackedVector2Array, shift: Vector2) -> PackedVector2Array:
+	var shifted := PackedVector2Array()
+	for point in points:
+		shifted.append(point + shift)
+	return shifted
 
 
 func _on_token_arrived(target: Node, resource: StringName) -> void:
