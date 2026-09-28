@@ -32,7 +32,7 @@ to_path = NodePath("../../Nodes/right1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinRight" index="1" unique_id=1722730627 instance=ExtResource("5_lock")]
 position = Vector2(876, 595.75)
-unlock_resource = &"seven"
+unlock_resource = &"diamond"
 unlock_cost = 5
 
 [node name="LinkLeft2" parent="Layout/TopField/LevelGraph/Edges" index="3" unique_id=758086593 instance=ExtResource("4_link")]

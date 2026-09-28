@@ -109,7 +109,7 @@ from_path = NodePath("%SlotMachine/Spin")
 to_path = NodePath("../../Nodes/right1")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkSpinRight" instance=ExtResource("5_lock")]
-unlock_resource = &"seven"
+unlock_resource = &"watermelon"
 unlock_cost = 3
 
 [node name="LinkLeft2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
@@ -141,7 +141,7 @@ from_path = NodePath("../../Nodes/mid1")
 to_path = NodePath("../../Nodes/left2")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkMidToLeft2" instance=ExtResource("5_lock")]
-unlock_resource = &"seven"
+unlock_resource = &"cherry"
 unlock_cost = 3
 
 [node name="LinkMidToRight2" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]
@@ -181,7 +181,7 @@ from_path = NodePath("../../Nodes/mid2")
 to_path = NodePath("../../Nodes/right3")
 
 [node name="Lock" parent="Layout/TopField/LevelGraph/Edges/LinkKeyToRight3" instance=ExtResource("5_lock")]
-unlock_resource = &"seven"
+unlock_resource = &"bell"
 unlock_cost = 3
 
 [node name="LinkLeftToSilo" parent="Layout/TopField/LevelGraph/Edges" instance=ExtResource("4_link")]

@@ -1,10 +1,9 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://features/slot_machine/slot_machine.gd" id="1_slot"]
 [ext_resource type="PackedScene" path="res://features/slot_machine/slot_reel.tscn" id="2_reel"]
 [ext_resource type="Texture2D" path="res://assets/icons/cherry.svg" id="3_cherry"]
 [ext_resource type="Texture2D" path="res://assets/icons/bell.svg" id="4_bell"]
-[ext_resource type="Texture2D" path="res://assets/icons/seven.svg" id="5_seven"]
 [ext_resource type="Texture2D" path="res://assets/icons/watermelon.svg" id="6_melon"]
 [ext_resource type="Texture2D" path="res://assets/icons/diamond.png" id="7_diamond"]
 
@@ -82,8 +81,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_slot")
-symbols = Array[Texture2D]([ExtResource("3_cherry"), ExtResource("4_bell"), ExtResource("5_seven"), ExtResource("6_melon"), ExtResource("7_diamond")])
-symbol_ids = Array[StringName]([&"cherry", &"bell", &"seven", &"watermelon", &"diamond"])
+symbols = Array[Texture2D]([ExtResource("3_cherry"), ExtResource("4_bell"), ExtResource("6_melon"), ExtResource("7_diamond")])
+symbol_ids = Array[StringName]([&"cherry", &"bell", &"watermelon", &"diamond"])
 
 [node name="ReelsCenter" type="CenterContainer" parent="."]
 layout_mode = 1

@@ -5,7 +5,7 @@ signal spin_started
 signal spin_finished(results: Array[StringName])
 
 @export var symbols: Array[Texture2D] = []
-@export var symbol_ids: Array[StringName] = [&"cherry", &"bell", &"seven", &"watermelon", &"diamond"]
+@export var symbol_ids: Array[StringName] = [&"cherry", &"bell", &"watermelon", &"diamond"]
 @export var spin_duration := 2.0
 @export var tick_interval := 0.08
 
